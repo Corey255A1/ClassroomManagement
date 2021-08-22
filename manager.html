@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Management</title>
+    <link rel="stylesheet" href="design.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Classroom Management</h1>
+    </div>
+    <div class="main">
+        <div class="side panel">
+            
+            <select id="class-selection">
+                <!-- <option>1st</option>
+                <option>2nd</option>
+                <option>3rd</option>
+                <option>4th</option>
+                <option>5th</option>
+                <option>6th</option>
+                <option>7th</option> -->
+            </select>
+            <div>
+                Sort:
+                <button id="sort-firstname">First Name</button>
+                <button id="sort-lastname">Last Name</button>
+            </div>
+            Filter: <input id="student-filter" type="text" value="" placeholder="search">
+            <ul id="student-list" class="drag-list">
+                <!-- <li class="data-item" data-record="1">Roberto Nunez</li>
+                <li class="data-item">Casandra LaGrange</li>
+                <li class="data-item">Timothy Johnson</li>
+                <li class="data-item">Giorgio DaVinci</li>
+                <li><button>+</button></li> -->
+            </ul>
+            <h3>Desk Properties</h3>
+            <button id="add-desk">Add Desk</button>
+        </div>
+        <div class="content">
+            <h2 class="content-title">Seating Chart</h2>
+            <div id="desk-view" class="desk-layout">
+                <!-- <div class="desk data-item" data-record="1" style="top:100px; left:100px;">
+                    <div class="desk-delete hidden">X</div>
+                    Roberto Nunez
+                </div> -->
+            </div>
+
+        </div>
+    </div>
+
+    <script src='graphics.js'></script>
+    <script src='interface.js'></script>
+    
+</body>
+</html>

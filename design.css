@@ -1,0 +1,120 @@
+*{
+    box-sizing: border-box;
+}
+html, body
+{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: sans-serif
+}
+
+h1{
+    margin: 0;
+    color: white;
+}
+h2{
+    margin: 0;
+}
+h3{
+    margin: 0;
+}
+
+.header{
+    padding: 2px;
+    background-color: black;
+}
+
+.hidden{
+    display: none;
+}
+
+.main{
+    display: grid;
+    background-color: black;
+    height: 100%;
+    grid-template-columns: 300px auto;
+    grid-template-rows: auto;
+    grid-template-areas: 
+    "sidebar content";
+
+}
+
+.side.panel
+{
+    padding:3px;
+    background-color: blue;
+    grid-area: sidebar;
+    color: white;
+}
+.content
+{
+    background-color: red;
+    grid-area: content;
+}
+.content-title{
+    color: white;
+    background-color: royalblue;
+    padding: 2px;
+}
+
+
+.drag-list
+{
+    list-style: none;
+    color: black;
+    padding: 0px;
+}
+
+.drag-list > li
+{
+    background-color: white;
+    border: 1px solid black;
+    padding: 2px;
+}
+.drag-list > li.highlight
+{
+    background-color: cornflowerblue;
+    color:white;
+    font-weight: bold;
+}
+
+
+.desk-layout{
+    position: relative;
+    background-color: teal;
+    height: 100%;
+    width: 100%;
+}
+
+.desk{
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    width: 125px;
+    height: 125px;
+    background-color: wheat;
+}
+
+.desk.highlight{
+    background-color: cornflowerblue;
+    color: white;
+    font-weight: bold;
+}
+
+.desk-delete{
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    color:white;
+}
+
+.desk-delete.hidden{
+    display: none;
+}
