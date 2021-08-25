@@ -256,14 +256,19 @@ class Desk
         this._element = document.createElement("div");
         this._content = document.createElement("div");
         let remove = document.createElement("button");
+        let clear = document.createElement("button");
         this._element.classList.add("desk");
         remove.classList.add("desk-delete");
         remove.addEventListener("click",()=>{this.Remove()});
+        clear.classList.add("desk-clear");
+        clear.addEventListener("click",()=>{this.Clear()});
         this._element.appendChild(remove);
+        this._element.appendChild(clear);
         this._element.appendChild(this._content);
         this._drop = new Droppable(this._element);
         this._data = undefined;
         this._removeCB = undefined;
+        this._clearCB = undefined;
     }
     get Element(){
         return this._element;
@@ -280,6 +285,15 @@ class Desk
     }
     OnRemove(cb){
         this._removeCB = cb;
+    }
+    OnClear(cb){
+        this._clearCB = cb;
+    }
+
+    Clear(){
+        this._data = undefined;
+        this._content.innerText = "";
+        if(this._clearCB) this._clearCB(this);
     }
 
     Remove(){

@@ -87,8 +87,12 @@ h3{
     width: 100%;
 }
 
+
+
 .desk{
     text-align: center;
+    font-weight: bold;
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -96,6 +100,9 @@ h3{
     width: 125px;
     height: 125px;
     background-color: wheat;
+    box-shadow: 1px 1px 2px black;
+    border-radius: 5px;
+    overflow: hidden;
 }
 
 .desk.highlight{
@@ -105,13 +112,21 @@ h3{
 }
 
 .desk-delete{
-    display: block;
     position: absolute;
     right: 0;
     top: 0;
     width: 20px;
     height: 20px;
     background-color: red;
+    color:white;
+}
+.desk-clear{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    height: 20px;
+    background-color: rgb(220, 150, 0);
     color:white;
 }
 
