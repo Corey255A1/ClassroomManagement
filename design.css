@@ -103,6 +103,12 @@ h3{
     box-shadow: 1px 1px 2px black;
     border-radius: 5px;
     overflow: hidden;
+    z-index: 1;
+}
+
+.desk.interactive{
+    background-color: rgba(28, 70, 70, 0.5);
+    z-index: 10;
 }
 
 .desk.highlight{
@@ -130,6 +136,20 @@ h3{
     color:white;
 }
 
-.desk-delete.hidden{
-    display: none;
+
+
+button{
+    background-color: white;
+    border-top: 2px solid white;
+    border-bottom: 2px solid black;
+    border-left: 2px solid white;
+    border-right: 2px solid black;
+}
+
+button.push-active{
+    background-color: darkgray;
+    border-top: 2px solid black;
+    border-bottom: 2px solid white;
+    border-left: 2px solid black;
+    border-right: 2px solid white;
 }

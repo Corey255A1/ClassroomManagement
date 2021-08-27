@@ -140,6 +140,8 @@ class MoveFrame
     constructor(id){
         this._element = document.getElementById(id);
         this._element.addEventListener("mousemove",(ev)=>{this.PointerMove(ev)});
+        this._element.addEventListener("mouseup",(ev)=>{this.PointerMove(ev,false)});
+        this._element.addEventListener("mousedown",(ev)=>{this.PointerMove(ev,true)});
         this._rect = this._element.getBoundingClientRect();
         this._pageX = this._rect.x;
         this._pageY = this._rect.y;
@@ -148,6 +150,7 @@ class MoveFrame
         this._lastX = 0;
         this._lastY = 0;
         this._grid_size = 5;
+        this._pointerMoveCB = undefined;
     }
     get Element(){
         return this._element;
@@ -155,24 +158,30 @@ class MoveFrame
     set GridSize(value){
         this._grid_size = value;
     }
+    OnPointerMove(callback){
+        this._pointerMoveCB = callback;
+    }
     RoundToGrid(value){
         return Math.floor(value/this._grid_size)*this._grid_size;
     }
-    AddObject(x,y,element){
-        let moveable = new Moveable(x,y,element, this);
-        this._objects.push(moveable);
+    AddObject(x,y,element,clickable){
         this._element.appendChild(element);
+        let moveable = new Moveable(x,y,element, this, clickable);
+        this._objects.push(moveable);
+        return moveable;
     }
-    PointerMove(ev){
+    PointerMove(ev,pointerState){
+        let x = this.RoundToGrid(ev.clientX - this._pageX);
+        let y = this.RoundToGrid(ev.clientY - this._pageY);
         if(this._current_interaction){
-            let x = this.RoundToGrid(ev.clientX - this._pageX);
-            let y = this.RoundToGrid(ev.clientY - this._pageY);
+            
             let dX = x - this._lastX;
             let dY = y - this._lastY;
             this._current_interaction.Move(dX,dY);
             this._lastX = x;
             this._lastY = y;
         }
+        if(this._pointerMoveCB) this._pointerMoveCB(x,y,pointerState);
     }
     SetInteraction(obj, x, y){
         this._current_interaction = obj;
@@ -187,25 +196,57 @@ class MoveFrame
 
 class Moveable
 {
-    constructor(x, y, element, parent){
+    constructor(x, y, element, parent, clickable){
         this._element = element;
+        this._rect = this._element.getBoundingClientRect();
+        console.log(this._rect);
+        this._half_width = Math.floor(this._rect.width/2);
+        this._half_height = Math.floor(this._rect.height/2);
         this._parent = parent;
         this._x = undefined;
         this._y = undefined;
         this.X = x;
         this.Y = y;
-        this._element.addEventListener("mousedown", (ev)=>{this.PointerDown(ev)});
-        this._element.addEventListener("mouseup", (ev)=>{this.PointerUp(ev)});
+        if(clickable){
+            this._element.addEventListener("mousedown", (ev)=>{this.PointerDown(ev)});
+            this._element.addEventListener("mouseup", (ev)=>{this.PointerUp(ev)});
+        }
+    }
+    MoveTo(x,y,center){
+        if(center){
+            let nx = x - this._half_width;
+            if(nx<0) nx = 0;
+            else if(nx>this._parent._rect.width) nx= this._parent._rect.width;
+            this.X = nx;
+
+            let ny = y - this._half_height;
+            if(ny<0) ny = 0;
+            else if(ny>this._parent._rect.height) ny= this._parent._rect.height;
+            this.Y = ny;
+        }else{
+            this.X = x;
+            this.Y = y;
+        }
     }
     Move(dx,dy){
-        this.X = this._x + dx;
-        this.Y = this._y + dy;
+        let nx = this._x + dx;
+        if(nx>0 && nx<this._parent._rect.width){
+            this.X = nx;
+        }
+        let ny = this._y + dy;
+        if(ny>0 && ny<this._parent._rect.height){
+            this.Y = ny;
+        }
     }
     PointerDown(ev){
         this._parent.SetInteraction(this, ev.clientX, ev.clientY);
     }
     PointerUp(ev){
         this._parent.ClearInteraction();
+    }
+    set Hidden(value){
+        if(value) this._element.style.display = "none";
+        else this._element.style.display = "";
     }
     get Element(){
         return this._element;
@@ -280,14 +321,14 @@ class Desk
         this._data = value;
         this._content.innerText = value[displayprop];
     }
-    OnDrop(cb){
-        this._drop.OnDrop(cb);
+    OnDrop(callback){
+        this._drop.OnDrop(callback);
     }
-    OnRemove(cb){
-        this._removeCB = cb;
+    OnRemove(callback){
+        this._removeCB = callback;
     }
-    OnClear(cb){
-        this._clearCB = cb;
+    OnClear(callback){
+        this._clearCB = callback;
     }
 
     Clear(){
@@ -310,11 +351,32 @@ class DeskManager
 {
     constructor(id){
         this._frame = new MoveFrame(id);
+        this._frame.OnPointerMove((x,y,state)=>{this.PointerMove(x,y,state)})
         this._desks = [];
+        this._newDeskCB = undefined;
+        this._interactiveAdd = false;
+        let interactive = document.createElement("div");
+        interactive.classList.add("desk");
+        interactive.classList.add("interactive");
+        this._interactive = this._frame.AddObject(0,0,interactive, false);
+        this._interactive.Hidden = true;
     }
 
     set GridSize(value){
         this._frame.GridSize = value;
+    }
+
+    set InteractiveAdd(value){
+        this._interactiveAdd = value;
+        if(this._interactiveAdd){
+            this._interactive.Hidden = false;
+        }else{
+            this._interactive.Hidden = true;
+        }
+    }
+
+    OnNewDesk(callback){
+        this._newDeskCB = callback;
     }
 
     Find(value,prop){
@@ -323,10 +385,13 @@ class DeskManager
             else return false;
         });
     }
-    NewDesk(){
+    NewDesk(x,y){
+        x = x===undefined ? 0 : x;
+        y = y===undefined ? 0 : y;
         let d = new Desk();
-        this._frame.AddObject(0,0,d.Element);
+        this._frame.AddObject(x,y,d.Element,true);
         this._desks.push(d);
+        if(this._newDeskCB) this._newDeskCB(d);
         return d;
     }
     Remove(desk){
@@ -335,6 +400,15 @@ class DeskManager
             this._desks.splice(idx,1);
         }
         desk.Element.remove();
+    }
+
+    PointerMove(x,y,state){
+        if(this._interactiveAdd){
+            this._interactive.MoveTo(x,y,true);
+            if(state===true){
+                this.NewDesk(this._interactive.X,this._interactive.Y);
+            }
+        }
     }
 }
 
@@ -373,6 +447,15 @@ Object.keys(Classes).forEach(key=>{
 
 const desk_manager = new DeskManager("desk-view");
 desk_manager.GridSize = 10;
+desk_manager.OnNewDesk((d)=>{
+    d.OnDrop((obj)=>{
+        d.SetData(obj,"name");
+    });
+    d.OnRemove((obj)=>{
+        desk_manager.Remove(obj);
+    });
+});
+
 class_options.SelectedItem = "2nd";
 let currentList = new DragList("student-list");
 currentList.SortKey = "lastname";
@@ -419,11 +502,12 @@ sort_last.addEventListener("click",()=>{
 const add_desk = document.getElementById("add-desk");
 add_desk.addEventListener("click",()=>{
     let d = desk_manager.NewDesk();
-    d.OnDrop((obj)=>{
-        d.SetData(obj,"name");
-    });
-    d.OnRemove((obj)=>{
-        desk_manager.Remove(obj);
-    })
+    
 });
 
+const quick_desk = document.getElementById("quick-desk");
+quick_desk.addEventListener("click",()=>{
+    quick_desk.classList.toggle("push-active");
+    let active = quick_desk.classList.contains("push-active");
+    desk_manager.InteractiveAdd = active;
+});
