@@ -115,8 +115,9 @@ h3{
 .icon-row{
     display: flex;
     flex-direction: row;
-    justify-content: right;
+    justify-content: flex-end;
     height: 15px;
+    width: 100%;
 }
 
 .icon{
@@ -152,6 +153,12 @@ h3{
 
 .desk.highlight{
     background-color: cornflowerblue;
+    color: white;
+    font-weight: bold;
+}
+
+.desk.selected{
+    background-color: rgb(40, 200, 0);
     color: white;
     font-weight: bold;
 }
