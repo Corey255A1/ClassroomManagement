@@ -13,7 +13,7 @@
     </div>
     <div class="main">
         <div class="side panel">
-            
+            Class Period
             <select id="class-selection">
                 <!-- <option>1st</option>
                 <option>2nd</option>
@@ -25,10 +25,11 @@
             </select>
             <div>
                 Sort:
-                <button id="sort-firstname">First Name</button>
-                <button id="sort-lastname">Last Name</button>
+                <button id="sort-firstname-btn">First Name</button>
+                <button id="sort-lastname-btn">Last Name</button>
             </div>
-            Filter: <input id="student-filter" type="text" value="" placeholder="search">
+            Filter: <input id="student-filter-edit" type="text" value="" placeholder="search">
+            Desk: <input type="checkbox" id="assigned-desk-chk">
             <ul id="student-list" class="drag-list">
                 <!-- <li class="data-item" data-record="1">Roberto Nunez</li>
                 <li class="data-item">Casandra LaGrange</li>
@@ -36,12 +37,24 @@
                 <li class="data-item">Giorgio DaVinci</li>
                 <li><button>+</button></li> -->
             </ul>
-            <h3>Desk Properties</h3>
-            <button id="add-desk">Add A Desk</button>
-            <button id="quick-desk" class="">Interactive Add</button>
         </div>
         <div class="content">
             <h2 class="content-title">Seating Chart</h2>
+            <div class="content-menu">
+                
+                <button class="med color1" id="add-desk-btn">Add A Desk</button>
+                <button class="med color1" id="quick-desk-btn" class="">Interactive Add</button>
+
+                <div class="labeled-edit med">
+                    <label for="desk-rows">Rows:</label>
+                    <input type="number" id="desk-rows-edit" value="1" autocomplete="off" name="desk-rows">
+                </div>
+                <div class="labeled-edit med">
+                    <label for="desk-columns">Cols:</label>
+                    <input type="number" id="desk-columns-edit" value="1" autocomplete="off" name="desk-columns">
+                </div>
+                <div class="info med">Desks: <span id="desk-count">0</span></div>
+            </div>
             <div id="desk-view" class="desk-layout">
                 <!-- <div class="desk data-item" data-record="1" style="top:100px; left:100px;">
                     <div class="desk-delete hidden">X</div>

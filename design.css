@@ -9,6 +9,18 @@ html, body
     font-family: sans-serif
 }
 
+.color1
+{
+    background-color: #001dbe;
+    color: white;
+}
+
+.color2
+{
+    background-color: #001dbe;
+    color: white;
+}
+
 h1{
     margin: 0;
     color: white;
@@ -49,12 +61,20 @@ h3{
 }
 .content
 {
-    background-color: red;
+    background-color: white;
     grid-area: content;
 }
 .content-title{
     color: white;
     background-color: royalblue;
+    padding: 2px;
+}
+
+.content-menu{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-weight: bold;
     padding: 2px;
 }
 
@@ -68,10 +88,15 @@ h3{
 
 .drag-list > li
 {
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
     background-color: white;
     border: 1px solid black;
-    padding: 2px;
+    padding: 4px;
+    margin: 2px;
 }
+
 .drag-list > li.highlight
 {
     background-color: cornflowerblue;
@@ -87,7 +112,21 @@ h3{
     width: 100%;
 }
 
+.icon-row{
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    height: 15px;
+}
 
+.icon{
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid black;
+    font-size: .7rem;
+    width: 15px;
+    height: 15px;
+}
 
 .desk{
     text-align: center;
@@ -139,11 +178,42 @@ h3{
 
 
 button{
+    display: block;
     background-color: white;
     border-top: 2px solid white;
     border-bottom: 2px solid black;
     border-left: 2px solid white;
     border-right: 2px solid black;
+    font-weight: bold;
+    font-size: .9rem;
+    margin: 2px;
+    overflow: hidden;
+    border-radius: 5px;
+    box-shadow: 1px 1px 1px black;
+}
+button:active
+{
+    box-shadow: none;
+}
+
+button.color1:hover
+{
+    background-color: #344888;
+    font-size: 1rem;
+}
+
+button.color1:active
+{
+    background-color: #344888;
+    border-top: 2px solid black;
+    border-bottom: 2px solid white;
+    border-left: 2px solid black;
+    border-right: 2px solid white;
+}
+
+button.med{
+    width: 150px;
+    height: 40px;
 }
 
 button.push-active{
@@ -152,4 +222,20 @@ button.push-active{
     border-bottom: 2px solid white;
     border-left: 2px solid black;
     border-right: 2px solid white;
+}
+.labeled-edit.med{
+    padding: 2px;
+    margin: 2px;
+}
+.labeled-edit.med>label{
+    font-weight: bold;
+}
+.labeled-edit.med>input{
+    width: 70px;
+    height: 40px;
+    font-size: 1.1rem;
+}
+.info.med{
+    margin: 2px;
+    width: 100px;
 }
