@@ -168,6 +168,18 @@ class MoveFrame
 {
     constructor(id){
         this._element = document.getElementById(id);
+        this._element.addEventListener("touchstart",(tev)=>{
+            tev.preventDefault();
+            tev.stopPropagation();
+            this.PointerInteract(tev.touches[0],true)
+        });
+        this._element.addEventListener("touchend",(tev)=>{
+            tev.preventDefault();
+            tev.stopPropagation();
+            this.PointerInteract(tev.touches[0],false)
+        });
+        this._element.addEventListener("touchcancel",(tev)=>{this.PointerInteract(tev.touches[0],false)});
+        this._element.addEventListener("touchmove",(tev)=>{this.PointerMove(tev.touches[0])});
         this._element.addEventListener("mouseenter",(ev)=>{this.PointerEnter(ev,true)});
         this._element.addEventListener("mouseleave",(ev)=>{this.PointerEnter(ev,false)});
         this._element.addEventListener("mousemove",(ev)=>{this.PointerMove(ev)});
@@ -210,27 +222,25 @@ class MoveFrame
         if(this._pointerEnterCB) this._pointerEnterCB(ev,entered);
     }
     PointerInteract(ev,pointerState){
-        let x = this.RoundToGrid(ev.clientX - this._pageX);
-        let y = this.RoundToGrid(ev.clientY - this._pageY);
+        
         if(pointerState===true){
             this._pointer_down = true;
+            let x = this.RoundToGrid(ev.clientX - this._pageX);
+            let y = this.RoundToGrid(ev.clientY - this._pageY);
+            this._lastX = x;
+            this._lastY = y;
         }else if(pointerState === false){
             this._pointer_down = false;
         }
-        this._lastX = x;
-        this._lastY = y;
-        if(this._pointerMoveCB) this._pointerMoveCB(x,y,pointerState);
+        
+        if(this._pointerMoveCB) this._pointerMoveCB(this._lastX,this._lastY,pointerState);
     }
-    PointerMove(ev,pointerState){
+    PointerMove(ev){
+        
         let x = this.RoundToGrid(ev.clientX - this._pageX);
         let y = this.RoundToGrid(ev.clientY - this._pageY);
         let dX = x - this._lastX;
         let dY = y - this._lastY;
-        if(pointerState===true){
-            this._pointer_down = true;
-        }else if(pointerState === false){
-            this._pointer_down = false;
-        }
         if(this._pointer_down){
             this._current_interactions.forEach((interaction)=>{
                 interaction.Move(dX,dY);
@@ -239,7 +249,7 @@ class MoveFrame
 
         this._lastX = x;
         this._lastY = y;
-        if(this._pointerMoveCB) this._pointerMoveCB(x,y,pointerState);
+        if(this._pointerMoveCB) this._pointerMoveCB(x,y);
     }
     SetInteraction(obj, x, y){
         if(this._current_interactions.indexOf(obj) == -1){
@@ -268,6 +278,14 @@ class Moveable
         this.X = x;
         this.Y = y;
         if(clickable){
+            this._element.addEventListener("touchstart",(tev)=>{
+                tev.preventDefault();
+                this.PointerDown(tev.touches[0])
+            });
+            this._element.addEventListener("touchend",(tev)=>{
+                tev.preventDefault();
+                this.PointerUp(tev.touches[0])
+            });
             this._element.addEventListener("mousedown", (ev)=>{this.PointerDown(ev)});
             this._element.addEventListener("mouseup", (ev)=>{this.PointerUp(ev)});
         }
