@@ -151,9 +151,10 @@ class ComboBox{
     SelectionChanged(){
         let selected = this._items.find(item=>item.Element.selected);
         if(selected){
+            let previous = this._selected_item;
             this._selected_item = selected;
             if(this._selected_item_changed_cb){
-                this._selected_item_changed_cb(this._selected_item);
+                this._selected_item_changed_cb(this._selected_item, previous);
             }
         }
     }
@@ -216,11 +217,11 @@ class MoveFrame
     RoundToGrid(value){
         return Math.floor(value/this._grid_size)*this._grid_size;
     }
-    AddObject(x,y,element,clickable){
-        this._element.appendChild(element);
-        let moveable = new Moveable(x,y,element, this, clickable);
-        this._objects.push(moveable);
-        return moveable;
+    AddObject(obj){
+        this._element.appendChild(obj.Element);
+        //let moveable = new Moveable(x,y,element, this, clickable);
+        this._objects.push(obj);
+        return obj;
     }
     PointerEnter(ev,entered){
         if(this._pointerEnterCB) this._pointerEnterCB(ev,entered);
@@ -275,11 +276,14 @@ class MoveFrame
 class Moveable
 {
     constructor(x, y, element, parentFrame, clickable){
+        this._parent_frame = parentFrame;
         this._element = element;
+        this._parent_frame.AddObject(this);
+        
         this._rect = this._element.getBoundingClientRect();
         this._half_width = Math.floor(this._rect.width/2);
         this._half_height = Math.floor(this._rect.height/2);
-        this._parent_frame = parentFrame;
+        
         this._x = undefined;
         this._y = undefined;
         this.X = x;
@@ -297,6 +301,7 @@ class Moveable
             this._element.addEventListener("mousedown", (ev)=>{this.PointerDown(ev)});
             this._element.addEventListener("mouseup", (ev)=>{this.PointerUp(ev)});
         }
+        
     }
     MoveTo(x,y,center){
         if(center){
@@ -429,11 +434,13 @@ class StudentListItem extends DragListItem{
 }
 
 
-class Desk
+class Desk extends Moveable
 {
-    constructor(){
-        this._element = document.createElement("div");
+    constructor(x,y,frame,clickable){
+        super(x,y,document.createElement("div"),frame, clickable)
         this._content = document.createElement("div");
+        this._numberElement = document.createElement("div");
+        this._numberElement.classList.add("desk-number");
         let remove = document.createElement("button");
         let clear = document.createElement("button");
         this._element.classList.add("desk");
@@ -441,6 +448,7 @@ class Desk
         remove.addEventListener("click",()=>{this.Remove()});
         clear.classList.add("desk-clear");
         clear.addEventListener("click",()=>{this.Clear()});
+        this._element.appendChild(this._numberElement);
         this._element.appendChild(remove);
         this._element.appendChild(clear);
         this._element.appendChild(this._content);
@@ -448,7 +456,17 @@ class Desk
         this._data = undefined;
         this._removeCB = undefined;
         this._clearCB = undefined;
+        this._dataSetCB = undefined;
         this._selected = false;
+        this._number = 0;
+    }
+
+    set Number(value){
+        this._number = value;
+        this._numberElement.textContent = value;
+    }
+    get Number(){
+        return this._number;
     }
 
     get Element(){
@@ -477,6 +495,7 @@ class Desk
     SetData(value,displayprop){
         this._data = value;
         this._content.innerText = value[displayprop];
+        if(this._dataSetCB) this._dataSetCB(value);
     }
     OnDrop(callback){
         this._drop.OnDrop(callback);
@@ -487,7 +506,9 @@ class Desk
     OnClear(callback){
         this._clearCB = callback;
     }
-
+    OnSetData(callback){
+        this._dataSetCB = callback;
+    }
     Clear(){
         if(this._clearCB) this._clearCB(this);
         this._data = undefined;
@@ -516,11 +537,11 @@ class DeskPlacementPreviewer
         this._x = 0;
         this._y = 0;
         for(let i=0;i<max;i++){
+            
             let elem = document.createElement("div");
             elem.classList.add("desk");
             elem.classList.add("interactive");
-            
-            let moveable = frame.AddObject(0,0,elem, false);
+            let moveable = new Moveable(0,0,elem,frame,false);
             moveable.Hidden = this._hidden;
             this._previewobjects.push(moveable);
         }
@@ -592,13 +613,6 @@ class DeskManager
         this._interactiveAdd = false;
 
         this._interactive = new DeskPlacementPreviewer(this._frame,30);
-        
-
-        // let interactive = document.createElement("div");
-        // interactive.classList.add("desk");
-        // interactive.classList.add("interactive");
-        // this._interactive = this._frame.AddObject(0,0,interactive, false);
-        // this._interactive.Hidden = true;
     }
     get Count(){
         return this._desks.length;
@@ -616,11 +630,6 @@ class DeskManager
 
     set InteractiveAdd(value){
         this._interactiveAdd = value;
-        // if(this._interactiveAdd){
-        //     this._interactive.Hidden = false;
-        // }else{
-        //     this._interactive.Hidden = true;
-        // }
     }
 
     OnDeskListModified(callback){
@@ -636,8 +645,9 @@ class DeskManager
     NewDesk(x,y){
         x = x===undefined ? 0 : x;
         y = y===undefined ? 0 : y;
-        let desk = new Desk();
-        this._frame.AddObject(x,y,desk.Element,true);
+        let desk = new Desk(x,y,this._frame,true);
+        desk.Number = this._desks.length + 1;
+        //this._frame.AddObject(desk);
         this._desks.push(desk);
         if(this._deskListModifiedCB) this._deskListModifiedCB(desk, true);
         return desk;
@@ -646,6 +656,7 @@ class DeskManager
         let idx = this._desks.indexOf(desk);
         if(idx >=0){
             this._desks.splice(idx,1);
+            this._desks.forEach((d,i)=>{d.Number = i+1});
         }
         desk.Element.remove();
         if(this._deskListModifiedCB) this._deskListModifiedCB(desk, false);
@@ -691,6 +702,49 @@ class DeskManager
             }
         }
     }
+
+    SetData(deskconfig, dataformatfunction){
+        let new_desk_count = deskconfig.length;
+        let current_desk_count = this._desks.length;
+        for(let n=0;n<deskconfig.length;n++){
+            let olddesk = deskconfig[n];
+            let currdesk;
+            if(n<current_desk_count){
+                currdesk = this._desks[n];
+                currdesk.MoveTo(olddesk.x, olddesk.y, false);
+                currdesk.Clear();
+            }else{
+                currdesk = this.NewDesk(olddesk.x, olddesk.y);
+            }
+            if(olddesk.data){
+                console.log(olddesk.data);
+                let format = dataformatfunction(olddesk.data);
+                if(format !== undefined && format.data !== undefined){
+                    currdesk.SetData(format.data,format.key);
+                }
+            }
+        }
+        let diff =  current_desk_count - new_desk_count;
+        if(diff > 0){
+            for(let n=0; n<diff; n++){
+                this.Remove(this._desks[new_desk_count]);
+            }
+        }
+    }
+
+    GetData(){
+        let ret=[]
+        this._desks.forEach((d)=>{ret.push({
+            number:d.Number,
+            x:d.X,
+            y:d.Y,
+            data:d.Data
+        })});
+        return ret;
+    }
+    ClearData(){
+        this._desks.forEach((d)=>{d.Clear()})
+    }
 }
 
 
@@ -715,6 +769,13 @@ const Classes = {
     ]}
 }
 
+const DeskConfiguration = {
+    "1st":[
+        {x:100, y:100, data:{uid:"1"}},
+        {x:200, y:150, data:{}}
+    ]
+}
+
 
 
 
@@ -731,7 +792,7 @@ student_list.SortKey = "lastname";
 function SetStudentList(class_key){
     student_list.Clear();
     Classes[class_key].students.forEach(student=>{
-        student.name = [student.firstname, student.lastname].join(" ");
+       student.name = [student.firstname, student.lastname].join(" ");
        let studentitem = new StudentListItem(student.name, student); 
        let item = student_list.AddItem(studentitem);
        item.OnHover((obj, hover)=>{
@@ -743,8 +804,30 @@ function SetStudentList(class_key){
     });
     student_list.Sort();
 }
-class_options.OnSelectedItemChanged((item)=>{
+class_options.OnSelectedItemChanged((item,prev)=>{
+    if(prev.Data){
+        let data = [];
+        desk_manager.GetData().forEach((desk)=>{
+            let chunk = {
+                x:desk.x,
+                y:desk.y
+             }
+             if(desk.data){
+                 chunk.data = {uid:desk.data.uid};
+             }
+            data.push(chunk);
+        })
+        DeskConfiguration[prev.Data] = data;
+    }
+
     SetStudentList(item.Data);
+    desk_manager.SetData(DeskConfiguration[item.Data],(data)=>{
+        if(data.uid!==undefined){
+            let student = Classes[item.Data].students.find(s=>s.uid==data.uid);
+            return {data:student,key:"name"}
+        }
+        return undefined;
+    });
 });
 
 SetStudentList(class_options.SelectedItem.Data);
@@ -790,12 +873,17 @@ desk_manager.OnDeskListModified((desk, added)=>{
                 }
             }
             desk.SetData(obj,"name");
-            let list_item = student_list.Find("uid",obj.uid);
-            if(list_item){
-                list_item.AddIndicator("D","has_desk");
-                student_list.RefreshFilter();
-            }
+            
         });
+        desk.OnSetData((obj)=>{
+            if(obj!== undefined && obj.uid !== undefined){
+                let list_item = student_list.Find("uid",obj.uid);
+                if(list_item){
+                    list_item.AddIndicator("D","has_desk");
+                    student_list.RefreshFilter();
+                }
+            }
+        })
         desk.OnClear((obj)=>{
             if(obj.Data){
                 let list_item = student_list.Find("uid",obj.Data.uid);
@@ -833,6 +921,29 @@ quick_desk.addEventListener("click",()=>{
     let active = quick_desk.classList.contains("push-active");
     desk_manager.InteractiveAdd = active;
 });
+
+
+const apply_to_all = document.getElementById("apply-to-all-btn");
+apply_to_all.addEventListener("click",()=>{
+    let data = [];
+    desk_manager.GetData().forEach((desk)=>{
+        data.push({x:desk.x,y:desk.y});
+    })
+    Object.keys(DeskConfiguration).forEach((class_period)=>{
+        let current_config = DeskConfiguration[class_period];
+        DeskConfiguration[class_period] = [];
+        data.forEach(d=>{
+            DeskConfiguration[class_period].push({x:d.x,y:d.y});
+        })
+        current_config.forEach((config,i)=>{
+            if(i<data.length && config.data){
+                DeskConfiguration[class_period][i].data = config.data;
+            }
+        })
+    });
+    
+});
+
 function toInt(value,def){
     let num = parseInt(value);
     if(isNaN(num)){
@@ -840,6 +951,9 @@ function toInt(value,def){
     }
     return num
 }
+
+
+
 const desk_rows_edit = document.getElementById("desk-rows-edit");
 desk_manager.PreviewRows = toInt(desk_rows_edit.value,1);
 desk_rows_edit.addEventListener("change",(e)=>{

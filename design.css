@@ -181,7 +181,13 @@ h3{
     background-color: rgb(220, 150, 0);
     color:white;
 }
-
+.desk-number{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+}
 
 
 button{
