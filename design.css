@@ -6,7 +6,9 @@ html, body
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: sans-serif
+    font-family: sans-serif;
+    font-weight:bold;
+    /* text-shadow: 1px 1px 1px black; */
 }
 
 .color1
@@ -59,6 +61,16 @@ h3{
     grid-area: sidebar;
     color: white;
 }
+
+.panel-row{
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+.panel-group{
+    background-color: darkslateblue;
+    padding: 4px;
+}
+
 .content
 {
     background-color: white;
@@ -78,12 +90,21 @@ h3{
     padding: 2px;
 }
 
+.combo{
+    width: 70px;
+    font-size: 1.2rem;
+    background-color: white;
+    box-shadow: 1px 1px 1px black;
+    border-radius: 5px;
+}
 
 .drag-list
 {
     list-style: none;
     color: black;
     padding: 0px;
+    overflow-y: scroll;
+    max-height: 470px;
 }
 
 .drag-list > li
@@ -93,8 +114,10 @@ h3{
     border-radius: 5px;
     background-color: white;
     border: 1px solid black;
+    text-shadow: none;
     padding: 4px;
     margin: 2px;
+    height: 45px;
 }
 
 .drag-list > li.highlight
@@ -193,10 +216,10 @@ h3{
 button{
     display: block;
     background-color: white;
-    border-top: 2px solid white;
+    /* border-top: 2px solid white;
     border-bottom: 2px solid black;
     border-left: 2px solid white;
-    border-right: 2px solid black;
+    border-right: 2px solid black; */
     font-weight: bold;
     font-size: .9rem;
     margin: 2px;
@@ -218,10 +241,10 @@ button.color1:hover
 button.color1:active
 {
     background-color: #344888;
-    border-top: 2px solid black;
+    /* border-top: 2px solid black;
     border-bottom: 2px solid white;
     border-left: 2px solid black;
-    border-right: 2px solid white;
+    border-right: 2px solid white; */
 }
 
 button.med{
@@ -229,12 +252,18 @@ button.med{
     height: 40px;
 }
 
+button.sm{
+    width: 90px;
+    height: 25px;
+    font-size: .8rem;
+}
+
 button.push-active{
     background-color: darkgray;
-    border-top: 2px solid black;
+    /* border-top: 2px solid black;
     border-bottom: 2px solid white;
     border-left: 2px solid black;
-    border-right: 2px solid white;
+    border-right: 2px solid white; */
 }
 .labeled-edit.med{
     padding: 2px;

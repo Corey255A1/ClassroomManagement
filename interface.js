@@ -717,7 +717,6 @@ class DeskManager
                 currdesk = this.NewDesk(olddesk.x, olddesk.y);
             }
             if(olddesk.data){
-                console.log(olddesk.data);
                 let format = dataformatfunction(olddesk.data);
                 if(format !== undefined && format.data !== undefined){
                     currdesk.SetData(format.data,format.key);
@@ -766,6 +765,18 @@ const Classes = {
         {firstname: "Wu",lastname: "Xingping",uid:"8",properties:{}},
         {firstname: "Robbie",lastname: "Jones",uid:"9",properties:{}},
         {firstname: "Robbie",lastname: "Jones",uid:"10",properties:{}},
+        {firstname:"Connor",lastname:"Schwendeman",uid:"11",properties:{}},
+        {firstname:"Alexis",lastname:"Lovelace",uid:"12",properties:{}},
+        {firstname:"Samantha",lastname:"Butterscotch",uid:"13",properties:{}},
+        {firstname: "Wu",lastname: "Xingping",uid:"14",properties:{}},
+        {firstname: "Robbie",lastname: "Jones",uid:"15",properties:{}},
+        {firstname: "Robbie",lastname: "Jones",uid:"16",properties:{}},
+        {firstname:"Connor",lastname:"Schwendeman",uid:"17",properties:{}},
+        {firstname:"Alexis",lastname:"Lovelace",uid:"18",properties:{}},
+        {firstname:"Samantha",lastname:"Butterscotch",uid:"19",properties:{}},
+        {firstname: "Wu",lastname: "Xingping",uid:"20",properties:{}},
+        {firstname: "Robbie",lastname: "Jones",uid:"21",properties:{}},
+        {firstname: "Robbie",lastname: "Jones",uid:"22",properties:{}},
     ]}
 }
 

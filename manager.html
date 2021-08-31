@@ -13,23 +13,19 @@
     </div>
     <div class="main">
         <div class="side panel">
-            Class Period
-            <select id="class-selection">
-                <!-- <option>1st</option>
-                <option>2nd</option>
-                <option>3rd</option>
-                <option>4th</option>
-                <option>5th</option>
-                <option>6th</option>
-                <option>7th</option> -->
-            </select>
-            <div>
-                Sort:
-                <button id="sort-firstname-btn">First Name</button>
-                <button id="sort-lastname-btn">Last Name</button>
+            <div class="panel-row">
+                Class Period
+                <select class="combo" id="class-selection">
+                    <!-- <option>1st</option>
+                    <option>2nd</option>
+                    <option>3rd</option>
+                    <option>4th</option>
+                    <option>5th</option>
+                    <option>6th</option>
+                    <option>7th</option> -->
+                </select>
             </div>
-            Filter: <input id="student-filter-edit" type="text" value="" placeholder="search">
-            Desk: <input type="checkbox" id="assigned-desk-chk">
+            
             <ul id="student-list" class="drag-list">
                 <!-- <li class="data-item" data-record="1">Roberto Nunez</li>
                 <li class="data-item">Casandra LaGrange</li>
@@ -37,6 +33,21 @@
                 <li class="data-item">Giorgio DaVinci</li>
                 <li><button>+</button></li> -->
             </ul>
+            <div class="panel-group">
+                <div class="panel-row">
+                    Sort by:
+                    <div style="display: flex; flex-direction: row;">
+                        <button class="sm" id="sort-firstname-btn">First Name</button>
+                        <button class="sm" id="sort-lastname-btn">Last Name</button>
+                    </div>
+                </div>
+                <div class="panel-row">
+                    Filter: <input id="student-filter-edit" type="text" value="" placeholder="search">
+                </div>
+                <div class="panel-row">
+                    Desk: <input type="checkbox" id="assigned-desk-chk">
+                </div>
+            </div>
         </div>
         <div class="content">
             <h2 class="content-title">Seating Chart</h2>
