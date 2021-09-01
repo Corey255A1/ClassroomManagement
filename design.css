@@ -42,6 +42,10 @@ h3{
 .hidden{
     display: none;
 }
+.no-pointer
+{
+    pointer-events: none;
+}
 
 .main{
     display: grid;

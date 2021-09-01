@@ -195,13 +195,15 @@ class MoveFrame
     constructor(id){
         this._element = document.getElementById(id);
         this._element.addEventListener("touchstart",(tev)=>{
-            tev.preventDefault();
-            tev.stopPropagation();
-            this.PointerInteract(tev.touches[0],true)
+            if(this.PointerInteract(tev.touches[0],true))
+            {
+                tev.preventDefault();
+                tev.stopPropagation();
+            }
         });
         this._element.addEventListener("touchend",(tev)=>{
-            tev.preventDefault();
-            tev.stopPropagation();
+            //tev.preventDefault();
+            //tev.stopPropagation();
             this.PointerInteract(tev.touches[0],false)
         });
         this._element.addEventListener("touchcancel",(tev)=>{this.PointerInteract(tev.touches[0],false)});
@@ -263,7 +265,10 @@ class MoveFrame
             this._pointer_down = false;
         }
         
-        if(this._pointerMoveCB) this._pointerMoveCB(this._lastX,this._lastY,pointerState);
+        if(this._pointerMoveCB){
+            return this._pointerMoveCB(this._lastX,this._lastY,pointerState);
+        }
+        return false;
     }
     PointerMove(ev){
         
@@ -314,17 +319,20 @@ class Moveable
         this.X = x;
         this.Y = y;
         this._was_moved = false;
+        this._pointer_down = false;
         if(clickable){
             this._element.addEventListener("touchstart",(tev)=>{
-                tev.preventDefault();
-                this.PointerDown(tev.touches[0])
+                if(tev.target === this._element){
+                    tev.preventDefault();
+                    this.PointerDown(tev.touches[0])
+                }
             });
             this._element.addEventListener("touchend",(tev)=>{
-                tev.preventDefault();
+                //tev.preventDefault();
                 this.PointerUp(tev.touches[0])
             });
-            this._element.addEventListener("mousedown", (ev)=>{this.PointerDown(ev)});
-            this._element.addEventListener("mouseup", (ev)=>{this.PointerUp(ev)});
+            this._element.addEventListener("mousedown", (ev)=>{ if(ev.srcElement === this._element) this.PointerDown(ev)});
+            this._element.addEventListener("mouseup", (ev)=>{ if(ev.srcElement === this._element) this.PointerUp(ev)});
         }
         
     }
@@ -358,10 +366,14 @@ class Moveable
     }
     PointerDown(ev){
         this._was_moved = false;
+        this._pointer_down = true;
         this._parent_frame.ObjectInteraction(this,true,this._was_moved);
     }
     PointerUp(ev){
-        this._parent_frame.ObjectInteraction(this,false,this._was_moved);
+        if(this._pointer_down){
+            this._parent_frame.ObjectInteraction(this,false,this._was_moved);
+            this._pointer_down = false;
+        }
     }
     set Hidden(value){
         if(value) this._element.style.display = "none";

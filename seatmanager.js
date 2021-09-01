@@ -4,6 +4,7 @@ class Desk extends Moveable
     constructor(x,y,frame,clickable){
         super(x,y,document.createElement("div"),frame, clickable)
         this._content = document.createElement("div");
+        this._content.classList.add("no-pointer");
         this._numberElement = document.createElement("div");
         this._numberElement.classList.add("desk-number");
         let remove = document.createElement("button");
@@ -174,8 +175,8 @@ class DeskManager
 {
     constructor(id){
         this._frame = new MoveFrame(id);
-        this._frame.OnPointerMove((x,y,state)=>{this.PointerMove(x,y,state)})
-        this._frame.OnPointerEnter((ev,state)=>{this.PointerEnter(ev,state)})
+        this._frame.OnPointerMove((x,y,state)=>this.PointerMove(x,y,state))
+        this._frame.OnPointerEnter((ev,state)=>this.PointerEnter(ev,state))
         this._frame.OnPointerInteracted((obj,interacted,wasMoved)=>{this.DeskInteracted(obj,interacted,wasMoved)})
         this._desks = [];
         this._deskListModifiedCB = undefined;
@@ -267,9 +268,10 @@ class DeskManager
                     this.NewDesk(data.value.X,data.value.Y);
                     data = objyield.next();
                 }
-                
             }
+            return true;
         }
+        return false;
     }
 
     SetData(deskconfig, dataformatfunction){
