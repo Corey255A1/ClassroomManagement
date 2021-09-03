@@ -211,7 +211,19 @@ h3{
     height: 20px;
     background-color: red;
     color:white;
+    padding: 0;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px black;
 }
+.desk-delete:hover{
+    background-color: rgb(255, 50, 50);
+    font-size: 1.0rem;
+ }
+ 
+.desk-delete::after{
+    content: "X";
+}
+
 .desk-clear{
     position: absolute;
     right: 0;
@@ -220,6 +232,16 @@ h3{
     height: 20px;
     background-color: rgb(220, 150, 0);
     color:white;
+    padding: 0;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px black;
+}
+.desk-clear:hover{
+    background-color:  rgb(250, 190, 60);
+    font-size: 1.0rem;
+ }
+.desk-clear::after{
+    content: "C";
 }
 .desk-number{
     position: absolute;
