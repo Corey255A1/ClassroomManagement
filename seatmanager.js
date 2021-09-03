@@ -286,20 +286,37 @@ class DeskManager
             this._desks.forEach((d,i)=>{d.Number = i+1});
         }
         desk.Element.remove();
+        if(this._currentSwap === desk){
+            this._currentSwap = undefined
+        }
         if(this._deskListModifiedCB) this._deskListModifiedCB(desk, false);
     }
 
     DeskInteracted(obj,interacted, wasMoved){
-        let desk = this._desks.find((d)=>{return d.Element === obj.Element});
-        if(!interacted && desk){
-            if(!wasMoved){
-                desk.Selected = !desk.Selected; 
+        if(obj === undefined){
+            if(interacted === false){
+                this._desks.forEach(
+                    (d)=>{
+                        if(d.Selected){
+                            d.Selected = false;
+                            this._frame.RemoveInteraction(d);
+                        }
+                    });
             }
-            if(!desk.Selected){
-                this._frame.RemoveInteraction(obj);
+        }
+        else
+        {
+            let desk = this._desks.find((d)=>{return d.Element === obj.Element});
+            if(!interacted && desk){
+                if(!wasMoved){
+                    desk.Selected = !desk.Selected; 
+                }
+                if(!desk.Selected){
+                    this._frame.RemoveInteraction(obj);
+                }
+            }else if(interacted){
+                this._frame.SetInteraction(obj);
             }
-        }else if(interacted){
-            this._frame.SetInteraction(obj);
         }
     }
 

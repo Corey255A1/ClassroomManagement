@@ -264,10 +264,10 @@ class MoveFrame
         }else if(pointerState === false){
             this._pointer_down = false;
         }
-        
-        if(this._pointerMoveCB){
-            return this._pointerMoveCB(this._lastX,this._lastY,pointerState);
-        }
+        if(this._pointerInteractedCB && ev.target === this._element) this._pointerInteractedCB(undefined, pointerState, undefined);
+        // if(this._pointerMoveCB){
+        //     return this._pointerMoveCB(this._lastX,this._lastY,pointerState);
+        // }
         return false;
     }
     PointerMove(ev){
