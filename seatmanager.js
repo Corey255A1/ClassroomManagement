@@ -30,7 +30,10 @@ class Desk extends Moveable
         this._swapCB = undefined;
         this._selected = false;
         this._number = 0;
-        this._dataFormatFunction = (data)=>{return data}
+        this._dataFormatFunction = (element, data)=>{
+            if(data!==undefined) element.textContent = data;
+            else element.textContent = "";
+        }
     }
 
     MakeOverlay(type,classes){
@@ -82,16 +85,12 @@ class Desk extends Moveable
 
     set DisplayFormat(func){
         this._dataFormatFunction = func;
+        this._dataFormatFunction(this._content, this._data);
     }
 
     set Data(value){
         this._data = value;
-        if(value !== undefined){
-            this._content.innerHTML = this._dataFormatFunction(value);
-        }else{
-            this._content.textContent = "";
-        }
-        
+        this._dataFormatFunction(this._content, this._data);        
         if(this._dataSetCB) this._dataSetCB(value);
     }
     get Data(){
@@ -255,11 +254,10 @@ class DeskManager
             else return false;
         });
     }
-    NewDesk(x,y, dataformatfunction){
+    NewDesk(x,y){
         x = x===undefined ? 0 : x;
         y = y===undefined ? 0 : y;
         let desk = new Desk(x,y,this._frame,true);
-        desk.DataDisplayFormat = dataformatfunction;
         desk.OnSwap((d)=>{
             if(this._currentSwap !== undefined && this._currentSwap !== d){
                 let tempData = this._currentSwap.Data;

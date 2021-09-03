@@ -121,8 +121,8 @@ const desk_count = document.getElementById("desk-count");
 desk_manager.GridSize = 10;
 desk_manager.OnDeskListModified((desk, added)=>{
     if(added){
-        desk.DisplayFormat = (data)=>{
-            return data["name"];
+        desk.DisplayFormat = (element,data)=>{
+            element.textContent = data["name"];
         }
         desk.OnDrop((obj)=>{
             let existing = desk_manager.Find("uid",obj.uid);
