@@ -122,7 +122,8 @@ desk_manager.GridSize = 10;
 desk_manager.OnDeskListModified((desk, added)=>{
     if(added){
         desk.DisplayFormat = (element,data)=>{
-            element.textContent = data["name"];
+            if(data !== undefined) element.textContent = data["name"];
+            else element.textContent = "";
         }
         desk.OnDrop((obj)=>{
             let existing = desk_manager.Find("uid",obj.uid);
