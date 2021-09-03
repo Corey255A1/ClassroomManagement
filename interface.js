@@ -85,8 +85,7 @@ class_options.OnSelectedItemChanged((item,prev)=>{
     SetStudentList(item.Data);
     desk_manager.SetData(DeskConfiguration[item.Data],(data)=>{
         if(data.uid!==undefined){
-            let student = Classes[item.Data].students.find(s=>s.uid==data.uid);
-            return {data:student,key:"name"}
+            return Classes[item.Data].students.find(s=>s.uid==data.uid);
         }
         return undefined;
     });
@@ -122,6 +121,9 @@ const desk_count = document.getElementById("desk-count");
 desk_manager.GridSize = 10;
 desk_manager.OnDeskListModified((desk, added)=>{
     if(added){
+        desk.DisplayFormat = (data)=>{
+            return data["name"];
+        }
         desk.OnDrop((obj)=>{
             let existing = desk_manager.Find("uid",obj.uid);
             if(existing){
@@ -135,7 +137,7 @@ desk_manager.OnDeskListModified((desk, added)=>{
                     student_list.RefreshFilter();
                 }
             }
-            desk.SetData(obj,"name");
+            desk.Data = obj;
             
         });
         desk.OnSetData((obj)=>{

@@ -1,30 +1,43 @@
-
 class Desk extends Moveable
 {
     constructor(x,y,frame,clickable){
         super(x,y,document.createElement("div"),frame, clickable)
         this._content = document.createElement("div");
         this._content.classList.add("no-pointer");
-        this._numberElement = document.createElement("div");
-        this._numberElement.classList.add("desk-number");
-        let remove = document.createElement("button");
-        let clear = document.createElement("button");
         this._element.classList.add("desk");
-        remove.classList.add("desk-delete");
+
+        this._numberElement = this.MakeOverlay("div",["desk-number"]);
+
+        let remove = this.MakeOverlay("button",["desk-delete"]);
         remove.addEventListener("click",()=>{this.Remove()});
-        clear.classList.add("desk-clear");
+
+        let clear = this.MakeOverlay("button",["desk-clear"]);       
         clear.addEventListener("click",()=>{this.Clear()});
+
+        let swap = this.MakeOverlay("button",["desk-swap"]);       
+        swap.addEventListener("click",()=>{this.Swap()});
+
         this._element.appendChild(this._numberElement);
         this._element.appendChild(remove);
         this._element.appendChild(clear);
+        this._element.appendChild(swap);
         this._element.appendChild(this._content);
         this._drop = new Droppable(this._element);
         this._data = undefined;
         this._removeCB = undefined;
         this._clearCB = undefined;
         this._dataSetCB = undefined;
+        this._swapCB = undefined;
         this._selected = false;
         this._number = 0;
+        this._dataFormatFunction = (data)=>{return data}
+    }
+
+    MakeOverlay(type,classes){
+        let element = document.createElement(type);
+        element.classList.add("desk-icon");
+        if(classes!==undefined)classes.forEach(c=>element.classList.add(c));
+        return element;
     }
 
     set Number(value){
@@ -39,9 +52,7 @@ class Desk extends Moveable
         return this._element;
     }
 
-    get Data(){
-        return this._data;
-    }
+    
 
     get Selected(){
         return this._selected;
@@ -54,14 +65,37 @@ class Desk extends Moveable
     }
 
     set Highlight(enable){
-        if(enable){this.Element.classList.add("highlight")}
+        if(enable){
+            this.Element.classList.remove("highlight-alt")
+            this.Element.classList.add("highlight")
+        }
         else{this.Element.classList.remove("highlight")};
     }
 
-    SetData(value,displayprop){
+    set HighlightAlt(enable){
+        if(enable){
+            this.Element.classList.remove("highlight")
+            this.Element.classList.add("highlight-alt")
+        }
+        else{this.Element.classList.remove("highlight-alt")};
+    }
+
+    set DisplayFormat(func){
+        this._dataFormatFunction = func;
+    }
+
+    set Data(value){
         this._data = value;
-        this._content.innerText = value[displayprop];
+        if(value !== undefined){
+            this._content.innerHTML = this._dataFormatFunction(value);
+        }else{
+            this._content.textContent = "";
+        }
+        
         if(this._dataSetCB) this._dataSetCB(value);
+    }
+    get Data(){
+        return this._data;
     }
     OnDrop(callback){
         this._drop.OnDrop(callback);
@@ -72,6 +106,10 @@ class Desk extends Moveable
     OnClear(callback){
         this._clearCB = callback;
     }
+    OnSwap(callback){
+        this._swapCB = callback;
+    }
+
     OnSetData(callback){
         this._dataSetCB = callback;
     }
@@ -83,6 +121,10 @@ class Desk extends Moveable
 
     Remove(){
         if(this._removeCB) this._removeCB(this);
+    }
+
+    Swap(){
+        if(this._swapCB) this._swapCB(this);
     }
 
     
@@ -183,6 +225,7 @@ class DeskManager
         this._interactiveAdd = false;
 
         this._interactive = new DeskPlacementPreviewer(this._frame,30);
+        this._currentSwap = undefined;
     }
     get Count(){
         return this._desks.length;
@@ -212,10 +255,26 @@ class DeskManager
             else return false;
         });
     }
-    NewDesk(x,y){
+    NewDesk(x,y, dataformatfunction){
         x = x===undefined ? 0 : x;
         y = y===undefined ? 0 : y;
         let desk = new Desk(x,y,this._frame,true);
+        desk.DataDisplayFormat = dataformatfunction;
+        desk.OnSwap((d)=>{
+            if(this._currentSwap !== undefined && this._currentSwap !== d){
+                let tempData = this._currentSwap.Data;
+                this._currentSwap.Data = d.Data;
+                d.Data = tempData
+                this._currentSwap.HighlightAlt = false;
+                this._currentSwap = undefined;
+            }else if(this._currentSwap !== undefined && this._currentSwap === d){
+                d.HighlightAlt = false;
+                this._currentSwap = undefined;
+            } else{
+                d.HighlightAlt = true;
+                this._currentSwap = d;
+            }
+        })
         desk.Number = this._desks.length + 1;
         //this._frame.AddObject(desk);
         this._desks.push(desk);
@@ -274,7 +333,7 @@ class DeskManager
         return false;
     }
 
-    SetData(deskconfig, dataformatfunction){
+    SetData(deskconfig, dataresolver){
         let new_desk_count = deskconfig.length;
         let current_desk_count = this._desks.length;
         for(let n=0;n<deskconfig.length;n++){
@@ -288,9 +347,9 @@ class DeskManager
                 currdesk = this.NewDesk(olddesk.x, olddesk.y);
             }
             if(olddesk.data){
-                let format = dataformatfunction(olddesk.data);
-                if(format !== undefined && format.data !== undefined){
-                    currdesk.SetData(format.data,format.key);
+                let resolveddata = dataresolver(olddesk.data);
+                if(resolveddata !== undefined){
+                    currdesk.Data = resolveddata;
                 }
             }
         }

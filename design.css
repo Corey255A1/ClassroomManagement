@@ -196,6 +196,11 @@ h3{
     color: white;
     font-weight: bold;
 }
+.desk.highlight-alt{
+    background-color: rgb(100, 237, 118);
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+}
 
 .desk.selected{
     background-color: rgb(40, 200, 0);
@@ -203,52 +208,59 @@ h3{
     font-weight: bold;
 }
 
-.desk-delete{
+.desk-icon{
     position: absolute;
-    right: 0;
-    top: 0;
     width: 20px;
     height: 20px;
-    background-color: red;
-    color:white;
     padding: 0;
     font-weight: bold;
-    text-shadow: 1px 1px 1px black;
-}
-.desk-delete:hover{
-    background-color: rgb(255, 50, 50);
-    font-size: 1.0rem;
- }
- 
-.desk-delete::after{
-    content: "X";
+    
 }
 
-.desk-clear{
-    position: absolute;
+.desk-icon.desk-delete{
+    right: 0;
+    top: 0;
+    /* background-color: red; */
+    padding: 0;
+    background-image:url(trash.svg);
+    background-size: cover;
+    background-color: red;
+    
+}
+.desk-delete:hover{
+    background-color: rgb(143, 0, 0);
+ }
+ 
+
+.desk-icon.desk-clear{
     right: 0;
     bottom: 0;
-    width: 20px;
-    height: 20px;
-    background-color: rgb(220, 150, 0);
-    color:white;
-    padding: 0;
-    font-weight: bold;
-    text-shadow: 1px 1px 1px black;
+    background-image:url(clear.svg);
+    background-size: cover;
+    background-color: rgb(0, 0, 255);
 }
 .desk-clear:hover{
-    background-color:  rgb(250, 190, 60);
+    background-color:  rgb(0, 0, 150);
     font-size: 1.0rem;
  }
-.desk-clear::after{
-    content: "C";
-}
-.desk-number{
-    position: absolute;
-    bottom: 0;
+
+
+ .desk-icon.desk-swap{
     left: 0;
-    width: 20px;
-    height: 20px;
+    bottom: 0;
+    background-image:url(swap.svg);
+    background-size: cover;
+    background-color: rgb(0, 150, 50);
+}
+.desk-swap:hover{
+    background-color:  rgb(0, 120, 20);
+    font-size: 1.0rem;
+ }
+
+
+.desk-icon.desk-number{
+    top: 0;
+    left: 0;
 }
 
 
@@ -259,6 +271,8 @@ button{
     border-bottom: 2px solid black;
     border-left: 2px solid white;
     border-right: 2px solid black; */
+    border:none;
+    outline: none;
     font-weight: bold;
     font-size: .9rem;
     margin: 2px;
