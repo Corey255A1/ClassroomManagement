@@ -150,6 +150,7 @@ class DeskPlacementPreviewer
             let elem = document.createElement("div");
             elem.classList.add("desk");
             elem.classList.add("interactive");
+            elem.classList.add("no-pointer");
             let moveable = new Moveable(0,0,elem,frame,false);
             moveable.Hidden = this._hidden;
             this._previewobjects.push(moveable);
@@ -302,6 +303,13 @@ class DeskManager
                             this._frame.RemoveInteraction(d);
                         }
                     });
+            }else if(this._interactiveAdd && interacted === true){
+                let objyield = this._interactive.GetCoords();
+                let data = objyield.next();
+                while(!data.done){
+                    this.NewDesk(data.value.X,data.value.Y);
+                    data = objyield.next();
+                }
             }
         }
         else
@@ -335,14 +343,6 @@ class DeskManager
     PointerMove(x,y,state){
         if(this._interactiveAdd){
             this._interactive.MoveTo(x,y,true);
-            if(state===true){
-                let objyield = this._interactive.GetCoords();
-                let data = objyield.next();
-                while(!data.done){
-                    this.NewDesk(data.value.X,data.value.Y);
-                    data = objyield.next();
-                }
-            }
             return true;
         }
         return false;
