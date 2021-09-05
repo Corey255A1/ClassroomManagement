@@ -390,3 +390,155 @@ class DeskManager
         this._desks.forEach((d)=>{d.Clear()})
     }
 }
+
+
+
+
+//Load in the plug in
+function LoadSeatingChart(class_options, student_list, data){
+    const desk_manager = new DeskManager("desk-view");
+
+    const Classes = data.classes;
+    const DeskConfiguration = data.deskconfiguration;
+
+    student_list.addOnItemHover((ev)=>{
+        let obj = ev.detail.obj;
+        let desk = desk_manager.Find("uid",obj.Data.uid);
+        if(desk){
+            desk.Highlight = ev.detail.hover;
+        }
+    });
+
+
+    //Update our data if the class is changed
+    class_options.addSelectedItemChanged((ev)=>{
+        let detail =ev.detail;
+        //Store off current data
+        if(detail.previous.Data){
+            let data = [];
+            desk_manager.GetData().forEach((desk)=>{
+                let chunk = {
+                    x:desk.x,
+                    y:desk.y
+                 }
+                 if(desk.data){
+                     chunk.data = {uid:desk.data.uid};
+                 }
+                data.push(chunk);
+            })
+            DeskConfiguration[detail.previous.Data] = data;
+        }
+        desk_manager.SetData(DeskConfiguration[detail.current.Data],(data)=>{
+            if(data.uid!==undefined){
+                return Classes[detail.current.Data].students.find(s=>s.uid==data.uid);
+            }
+            return undefined;
+        });
+    });
+
+    const desk_count = document.getElementById("desk-count");
+    desk_manager.GridSize = 10;
+    desk_manager.OnDeskListModified((desk, added)=>{
+        if(added){
+            desk.DisplayFormat = (element,data)=>{
+                if(data !== undefined) element.textContent = data["name"];
+                else element.textContent = "";
+            }
+            desk.OnDrop((obj)=>{
+                let existing = desk_manager.Find("uid",obj.uid);
+                if(existing){
+                    existing.Clear();
+                    existing.Highlight = false;
+                }
+                if(desk.Data !== undefined){
+                    let list_item = student_list.Find("uid",desk.Data.uid);
+                    if(list_item){
+                        list_item.RemoveIndicator("has_desk");
+                        student_list.RefreshFilter();
+                    }
+                }
+                desk.Data = obj;
+                
+            });
+            desk.OnSetData((obj)=>{
+                if(obj!== undefined && obj.uid !== undefined){
+                    let list_item = student_list.Find("uid",obj.uid);
+                    if(list_item){
+                        list_item.AddIndicator("D","has_desk");
+                        student_list.RefreshFilter();
+                    }
+                }
+            })
+            desk.OnClear((obj)=>{
+                if(obj.Data){
+                    let list_item = student_list.Find("uid",obj.Data.uid);
+                    if(list_item){
+                        list_item.RemoveIndicator("has_desk");
+                        student_list.RefreshFilter();
+                    }
+                }
+            })
+            desk.OnRemove((obj)=>{
+                desk_manager.Remove(obj);
+                if(obj.Data){
+                    let list_item = student_list.Find("uid",obj.Data.uid);
+                    if(list_item){
+                        list_item.RemoveIndicator("has_desk");
+                        student_list.RefreshFilter();
+                    }
+                }
+            });
+        }
+        desk_count.textContent = desk_manager.Count;
+    });
+    
+    const add_desk = document.getElementById("add-desk-btn");
+    add_desk.addEventListener("click",()=>{
+        let d = desk_manager.NewDesk();        
+    }); 
+
+    const quick_desk = document.getElementById("quick-desk-btn");
+    quick_desk.addEventListener("click",()=>{
+        quick_desk.classList.toggle("push-active");
+        let active = quick_desk.classList.contains("push-active");
+        desk_manager.InteractiveAdd = active;
+    });
+
+    const apply_to_all = document.getElementById("apply-to-all-btn");
+    apply_to_all.addEventListener("click",()=>{
+        let data = [];
+        desk_manager.GetData().forEach((desk)=>{
+            data.push({x:desk.x,y:desk.y});
+        })
+        Object.keys(DeskConfiguration).forEach((class_period)=>{
+            let current_config = DeskConfiguration[class_period];
+            DeskConfiguration[class_period] = [];
+            data.forEach(d=>{
+                DeskConfiguration[class_period].push({x:d.x,y:d.y});
+            })
+            current_config.forEach((config,i)=>{
+                if(i<data.length && config.data){
+                    DeskConfiguration[class_period][i].data = config.data;
+                }
+            })
+        });
+        
+    });
+
+    const desk_rows_edit = document.getElementById("desk-rows-edit");
+    function UpdateRowControl(){
+        desk_manager.PreviewRows = toInt(desk_rows_edit.value,1);
+    }
+    UpdateRowControl();
+    desk_rows_edit.addEventListener("change",UpdateRowControl);
+    desk_rows_edit.addEventListener("input",UpdateRowControl);
+
+    const desk_columns_edit = document.getElementById("desk-columns-edit");
+    function UpdateColControl(){
+        desk_manager.PreviewColumns = toInt(desk_columns_edit.value,1);
+    }
+    UpdateColControl();
+    desk_columns_edit.addEventListener("change",UpdateColControl);
+    desk_columns_edit.addEventListener("input",UpdateColControl);
+}
+

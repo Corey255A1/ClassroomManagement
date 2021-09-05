@@ -50,15 +50,15 @@ const DeskConfiguration = {
 
 
 //Tool Selection
-const tool_select = document.getElementById("tool-selection");
-tool_select.addEventListener("navcomboselected",(e)=>{
-    console.log(e.detail);
-})
+//Dynamic Load Seating Chart Tool
+const tool_insertion = document.getElementById("tool-insert");
+
+
 
 
 
 //Build Class List Selections
-let class_options = new ComboBox("class-selection");
+const class_options = new ComboBox("class-selection");
 Object.keys(Classes).forEach(key=>{
     class_options.AddItem(key,key);
 });
@@ -101,8 +101,6 @@ sort_last.addEventListener("click",()=>{
     student_list.Sort();
 });
 
-
-
 function FilterByHasDesk(value){
     if(value){
         student_list.AddFilter("has_desk",(items)=>!items.HasIndicator("has_desk"));
@@ -119,162 +117,22 @@ assigned_desk_chk.addEventListener("change",(e)=>{
 
 
 
-//Dynamic Load Seating Chart Tool
-const tool_insertion = document.getElementById("tool-insert");
-fetch("seatingchart_part.html").then(resp=>{
-    resp.text().then(t=>{
-        tool_insertion.innerHTML = t;
-        LoadSeatingChart();
-    })
-});
-
-function LoadSeatingChart(){
-    const desk_manager = new DeskManager("desk-view");
-
-    student_list.addOnItemHover((ev)=>{
-        let obj = ev.detail.obj;
-        let desk = desk_manager.Find("uid",obj.Data.uid);
-        if(desk){
-            desk.Highlight = ev.detail.hover;
-        }
-    });
-
-
-    //Update our data if the class is changed
-    class_options.addSelectedItemChanged((ev)=>{
-        let detail =ev.detail;
-        //Store off current data
-        if(detail.previous.Data){
-            let data = [];
-            desk_manager.GetData().forEach((desk)=>{
-                let chunk = {
-                    x:desk.x,
-                    y:desk.y
-                 }
-                 if(desk.data){
-                     chunk.data = {uid:desk.data.uid};
-                 }
-                data.push(chunk);
-            })
-            DeskConfiguration[detail.previous.Data] = data;
-        }
-        desk_manager.SetData(DeskConfiguration[detail.current.Data],(data)=>{
-            if(data.uid!==undefined){
-                return Classes[detail.current.Data].students.find(s=>s.uid==data.uid);
-            }
-            return undefined;
-        });
-    });
-
-    const desk_count = document.getElementById("desk-count");
-    desk_manager.GridSize = 10;
-    desk_manager.OnDeskListModified((desk, added)=>{
-        if(added){
-            desk.DisplayFormat = (element,data)=>{
-                if(data !== undefined) element.textContent = data["name"];
-                else element.textContent = "";
-            }
-            desk.OnDrop((obj)=>{
-                let existing = desk_manager.Find("uid",obj.uid);
-                if(existing){
-                    existing.Clear();
-                    existing.Highlight = false;
-                }
-                if(desk.Data !== undefined){
-                    let list_item = student_list.Find("uid",desk.Data.uid);
-                    if(list_item){
-                        list_item.RemoveIndicator("has_desk");
-                        student_list.RefreshFilter();
-                    }
-                }
-                desk.Data = obj;
-                
-            });
-            desk.OnSetData((obj)=>{
-                if(obj!== undefined && obj.uid !== undefined){
-                    let list_item = student_list.Find("uid",obj.uid);
-                    if(list_item){
-                        list_item.AddIndicator("D","has_desk");
-                        student_list.RefreshFilter();
-                    }
-                }
-            })
-            desk.OnClear((obj)=>{
-                if(obj.Data){
-                    let list_item = student_list.Find("uid",obj.Data.uid);
-                    if(list_item){
-                        list_item.RemoveIndicator("has_desk");
-                        student_list.RefreshFilter();
-                    }
-                }
-            })
-            desk.OnRemove((obj)=>{
-                desk_manager.Remove(obj);
-                if(obj.Data){
-                    let list_item = student_list.Find("uid",obj.Data.uid);
-                    if(list_item){
-                        list_item.RemoveIndicator("has_desk");
-                        student_list.RefreshFilter();
-                    }
-                }
-            });
-        }
-        desk_count.textContent = desk_manager.Count;
-    });
-    
-    
-    
-    const add_desk = document.getElementById("add-desk-btn");
-    add_desk.addEventListener("click",()=>{
-        let d = desk_manager.NewDesk();
-        
-    });
-    
-    const quick_desk = document.getElementById("quick-desk-btn");
-    quick_desk.addEventListener("click",()=>{
-        quick_desk.classList.toggle("push-active");
-        let active = quick_desk.classList.contains("push-active");
-        desk_manager.InteractiveAdd = active;
-    });
-    
-    
-    const apply_to_all = document.getElementById("apply-to-all-btn");
-    apply_to_all.addEventListener("click",()=>{
-        let data = [];
-        desk_manager.GetData().forEach((desk)=>{
-            data.push({x:desk.x,y:desk.y});
+function LoadPlugin(plugin_name, init){
+    fetch(plugin_name+".html").then(resp=>{
+        resp.text().then(t=>{
+            tool_insertion.innerHTML = t;
         })
-        Object.keys(DeskConfiguration).forEach((class_period)=>{
-            let current_config = DeskConfiguration[class_period];
-            DeskConfiguration[class_period] = [];
-            data.forEach(d=>{
-                DeskConfiguration[class_period].push({x:d.x,y:d.y});
-            })
-            current_config.forEach((config,i)=>{
-                if(i<data.length && config.data){
-                    DeskConfiguration[class_period][i].data = config.data;
-                }
-            })
-        });
-        
     });
-
-
-    const desk_rows_edit = document.getElementById("desk-rows-edit");
-    desk_manager.PreviewRows = toInt(desk_rows_edit.value,1);
-    desk_rows_edit.addEventListener("change",(e)=>{
-        desk_manager.PreviewRows = toInt(desk_rows_edit.value,1);
+    const plugin = document.createElement("script")
+    plugin.setAttribute("src",plugin_name+".js");
+    document.body.appendChild(plugin);
+    plugin.addEventListener("load",()=>{
+        window[init](class_options, student_list, {classes:Classes, deskconfiguration:DeskConfiguration});
     })
-    desk_rows_edit.addEventListener("input",(e)=>{
-        desk_manager.PreviewRows = toInt(desk_rows_edit.value,1);
-    })
-    const desk_columns_edit = document.getElementById("desk-columns-edit");
-    desk_manager.PreviewColumns = toInt(desk_columns_edit.value,1);
-    desk_columns_edit.addEventListener("change",(e)=>{
-        desk_manager.PreviewColumns = toInt(desk_columns_edit.value,1);
-    })
-    desk_columns_edit.addEventListener("input",(e)=>{
-        desk_manager.PreviewColumns = toInt(desk_columns_edit.value,1);
-    })
-    
 }
+
+
+const tool_select = document.getElementById("tool-selection");
+tool_select.addEventListener("navcomboselected",(e)=>{
+    LoadPlugin(e.detail.dataset.plugin, e.detail.dataset.init);
+});

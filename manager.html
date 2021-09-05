@@ -54,8 +54,8 @@
                 <div class="nav-combo" id="tool-selection">
                     <div class="nav-current"></div>
                     <div class="nav-options collapsed" id="tool-list">
-                        <a href="#student-info">Student Info</a>
-                        <a href="#seating-chart" class="selected">Seating Chart</a>
+                        <a href="#student-info" class="selected" data-plugin="studentinfo" data-init="LoadStudentInfo">Student Info</a>
+                        <a href="#seating-chart"  data-plugin="seatingchart" data-init="LoadSeatingChart">Seating Chart</a>
                     </div>
                     <button class="nav-open">=</button>
                 </div>
@@ -68,7 +68,6 @@
 
     <script src='controls.js'></script>
     <script src='studentlist.js'></script>
-    <script src='seatmanager.js'></script>
     <script src='interface.js'></script>
     
 </body>
