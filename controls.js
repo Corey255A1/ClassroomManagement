@@ -68,7 +68,13 @@ class DragList
             i.Element.remove();
             this._element.appendChild(i.Element);
         })
-        
+    }
+
+    addOnItemHover(e){
+        this._element.addEventListener("itemhover",e);
+    }
+    removeOnItemHover(e){
+        this._element.removeEventListener("itemhover",e);
     }
 
     Clear()
@@ -77,12 +83,20 @@ class DragList
         this._element.innerText = "";
     }
     AddItem(item){
+        item.OnHover((obj, hover)=>{
+            let event = new CustomEvent("itemhover",{"detail":{obj:obj,hover:hover}});
+            this._element.dispatchEvent(event);
+        });
         this._items.push(item)
         this._element.appendChild(item.Element);
         return item;
     }
     NewItem(content, data){
         let item = new DragListItem(content, data);
+        item.OnHover((obj, hover)=>{
+            let event = new CustomEvent("itemhover",{"detail":{obj:obj,hover:hover}});
+            this._element.dispatchEvent(event);
+        });
         this._items.push(item)
         this._element.appendChild(item.Element);
         return item;
@@ -152,10 +166,9 @@ class ComboBox{
         this._element.addEventListener("change",()=>{this.SelectionChanged()});
         this._items = [];
         this._selected_item = undefined;
-        this._selected_item_changed_cb = undefined;
     }
-    OnSelectedItemChanged(callback){
-        this._selected_item_changed_cb = callback;
+    addSelectedItemChanged(callback){
+        this._element.addEventListener("selecteditemchanged",callback)
     }
     set SelectedItem(value){
         if(this._selected_item && 
@@ -178,9 +191,8 @@ class ComboBox{
         if(selected){
             let previous = this._selected_item;
             this._selected_item = selected;
-            if(this._selected_item_changed_cb){
-                this._selected_item_changed_cb(this._selected_item, previous);
-            }
+            let event = new CustomEvent("selecteditemchanged",{"detail":{current:this._selected_item, previous:previous}});
+            this._element.dispatchEvent(event);
         }
     }
     AddItem(content, data){
@@ -411,3 +423,39 @@ class Moveable
         return this._half_height;
     }
 }
+
+
+
+
+//Fancy Nav Drop Down
+const nav_combo = document.querySelectorAll(".nav-combo");
+nav_combo.forEach((nav)=>{
+    const current = nav.querySelector(".nav-current");
+    let selected = undefined;
+    const open = nav.querySelector(".nav-open");
+    const options = nav.querySelector(".nav-options");
+    const all_links = nav.querySelectorAll("a");
+    all_links.forEach((l)=>{
+        if(l.classList.contains("selected"))
+        {
+            current.textContent = l.textContent;
+            selected = l;
+        }
+        l.addEventListener("click",(e)=>{
+            options.classList.add("collapsed");
+            if(selected !== undefined && selected !== l){
+                selected.classList.remove("selected");
+                l.classList.add("selected");
+                current.textContent = l.textContent;
+                selected = l;
+                const event = new CustomEvent("navcomboselected", {"detail":l});
+                nav.dispatchEvent(event);
+            }
+        });
+    })
+    
+    open.addEventListener("click",()=>
+    {
+        options.classList.toggle("collapsed");
+    })
+})

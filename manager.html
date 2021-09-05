@@ -50,30 +50,19 @@
             </div>
         </div>
         <div class="content">
-            <h2 class="content-title">Seating Chart</h2>
-            <div class="content-menu">
-                
-                <button class="med color1" id="add-desk-btn">Add A Desk</button>
-                <button class="med color1" id="quick-desk-btn" class="">Interactive Add</button>
-                <button class="med color1" id="apply-to-all-btn" class="">Set All Classes</button>
-
-                <div class="labeled-edit med">
-                    <label for="desk-rows">Rows:</label>
-                    <input type="number" id="desk-rows-edit" value="1" autocomplete="off" name="desk-rows">
+            <div class="content-header">
+                <div class="nav-combo" id="tool-selection">
+                    <div class="nav-current"></div>
+                    <div class="nav-options collapsed" id="tool-list">
+                        <a href="#student-info">Student Info</a>
+                        <a href="#seating-chart" class="selected">Seating Chart</a>
+                    </div>
+                    <button class="nav-open">=</button>
                 </div>
-                <div class="labeled-edit med">
-                    <label for="desk-columns">Cols:</label>
-                    <input type="number" id="desk-columns-edit" value="1" autocomplete="off" name="desk-columns">
-                </div>
-                <div class="info med">Desks: <span id="desk-count">0</span></div>
             </div>
-            <div id="desk-view" class="desk-layout">
-                <!-- <div class="desk data-item" data-record="1" style="top:100px; left:100px;">
-                    <div class="desk-delete hidden">X</div>
-                    Roberto Nunez
-                </div> -->
-            </div>
+            <div class="content-body" id="tool-insert">
 
+            </div>
         </div>
     </div>
 

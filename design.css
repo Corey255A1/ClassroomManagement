@@ -19,8 +19,10 @@ html, body
 
 .color2
 {
-    background-color: #001dbe;
-    color: white;
+    background-color: #0022e0;
+    color: rgb(0, 0, 0);
+    text-shadow: 1px 1px px white;
+    font-weight: bold;
 }
 
 h1{
@@ -93,6 +95,12 @@ h3{
     font-weight: bold;
     padding: 2px;
 }
+.content-header{
+    height: 30px;
+}
+.content-body{
+    height: 100%;
+}
 
 .combo{
     width: 70px;
@@ -100,6 +108,16 @@ h3{
     background-color: white;
     box-shadow: 1px 1px 1px black;
     border-radius: 5px;
+}
+
+.combo-wide{
+    width: 210px;
+    font-size: 1.2rem;
+    box-shadow: 1px 1px 1px black;
+    border-radius: 5px;
+    margin: 2px;
+    padding: 2px;
+    outline: none;
 }
 
 .drag-list
@@ -333,4 +351,58 @@ button.push-active{
 .info.med{
     margin: 2px;
     width: 100px;
+}
+
+
+
+.nav-combo{
+    position: absolute;
+    width: 200px;
+    margin: 5px;
+    background-color: rgb(0, 132, 255);
+    box-shadow: 1px 1px 2px black;
+    z-index: 2;
+}
+.nav-open{
+    margin: 0;
+    border-radius: 0;
+    border:none;
+    box-shadow: none;
+}
+.nav-open{
+    cursor: pointer;
+}
+
+.nav-current{
+    font-size: 1.2rem;
+    color: white;
+    background-color:rgb(0, 91, 175);
+    text-shadow: 1px 1px 2px black;
+    width: 100%;
+    height: 25px;
+    padding: 1px;
+}
+
+.nav-options > a{
+    display: block;
+    text-decoration: none;
+    color:white;
+    padding: 3px;
+}
+
+.nav-options > a:hover{
+   background-color: rgb(185, 221, 255);
+   color: black;
+}
+
+.nav-options.collapsed{
+    display: none;
+}
+
+.nav-combo > .nav-open{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 25px;
+    height: 25px;
 }
