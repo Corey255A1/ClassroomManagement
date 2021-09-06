@@ -404,7 +404,7 @@ function LoadSeatingChart(class_options, student_list, data){
     
 
     student_list.addOnItemHover((ev)=>{
-        let obj = ev.detail.obj;
+        let obj = ev.detail.dataobject;
         let desk = desk_manager.Find("uid",obj.Data.uid);
         if(desk){
             desk.Highlight = ev.detail.hover;

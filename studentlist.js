@@ -1,8 +1,8 @@
-
 class StudentListItem extends DragListItem{
     constructor(name,data){
         super("",data);
         this._nameElement = document.createElement("div");
+        this._nameElement.classList.add("no-pointer");
         this._nameElement.textContent = name;
         this._indicatorsElement = document.createElement("div");
         this._indicatorsElement.classList.add("icon-row");

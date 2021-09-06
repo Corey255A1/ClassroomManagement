@@ -49,14 +49,8 @@ const DeskConfiguration = {
 }
 
 
-//Tool Selection
-//Dynamic Load Seating Chart Tool
-const tool_insertion = document.getElementById("tool-insert");
 
-
-
-
-
+//Student List Sidebar
 //Build Class List Selections
 const class_options = new ComboBox("class-selection");
 Object.keys(Classes).forEach(key=>{
@@ -115,11 +109,13 @@ assigned_desk_chk.addEventListener("change",(e)=>{
 })
 
 
-
+//Tool Selection Content
+//Dynamic Load Seating Chart Tool
+const tool_insertion = document.getElementById("tool-insert");
 const loaded_plugins = {};
 function LoadPlugin(plugin_name, init){
     const previously_loaded = loaded_plugins[plugin_name]!==undefined
-    fetch(plugin_name+".html").then(resp=>{
+    fetch("plugins/"+plugin_name+".html").then(resp=>{
         resp.text().then(t=>{
             tool_insertion.innerHTML = t;
             if(previously_loaded){
@@ -127,7 +123,7 @@ function LoadPlugin(plugin_name, init){
             }
             else{
                 const plugin = document.createElement("script")
-                plugin.setAttribute("src",plugin_name+".js");
+                plugin.setAttribute("src","plugins/"+plugin_name+".js");
                 document.body.appendChild(plugin);
                 plugin.addEventListener("load",()=>{
                     window[init](class_options, student_list, {classes:Classes, deskconfiguration:DeskConfiguration});
@@ -138,6 +134,7 @@ function LoadPlugin(plugin_name, init){
     });
 }
 
+LoadPlugin("studentinfo","LoadStudentInfo");
 
 const tool_select = document.getElementById("tool-selection");
 tool_select.addEventListener("navcomboselected",(e)=>{

@@ -1,5 +1,4 @@
 //Try To make some reusable sensical Classes for stuff
-
 class DataItem
 {
     constructor(domelement, data){
@@ -26,23 +25,43 @@ class DragListItem extends DataItem
         this._element.addEventListener("dragstart",(ev)=>{this.DragStart(ev);});
         this._element.addEventListener("mouseover",()=>{this.Hover(true)});
         this._element.addEventListener("mouseleave",()=>{this.Hover(false)});
+        this._element.addEventListener("click",()=>{this.Clicked()});
         this._hoverCB = undefined;
+        this._selected = false;
     }
-    OnHover(cb){
-        this._hoverCB = cb;
+
+    set Hidden(hidden){
+        if(hidden) this._element.style.display = "none";
+        else this._element.style.display = "";
+    }
+    set Selected(value){
+        if(value) this._element.classList.add("selected");
+        else this._element.classList.remove("selected");
+        this._selected = value;
+    }
+    get Selected(){
+        return this._selected;
     }
     DragStart(ev){
         ev.dataTransfer.setData("text/plain", JSON.stringify(this.Data));
+    }
+
+    OnHover(cb){
+        this._hoverCB = cb;
     }
     Hover(active){
         //if(active) this._element.classList.add("highlight");
         //else this._element.classList.remove("highlight");
         if(this._hoverCB) this._hoverCB(this, active);
     }
-    set Hidden(hidden){
-        if(hidden) this._element.style.display = "none";
-        else this._element.style.display = "";
+
+    OnClicked(cb){
+        this._clickedCB = cb;
     }
+    Clicked(){
+        if(this._clickedCB) this._clickedCB(this);
+    }
+
 
 }
 
@@ -54,10 +73,16 @@ class DragList
         this._items = [];
         this._sort_key = undefined;
         this._current_filters = {};
+        this._current_selected_item = undefined;
     }
 
     set SortKey(value){
         this._sort_key = value;
+    }
+
+    get SelectedItem()
+    {
+        return this._current_selected_item;
     }
 
     Sort(){
@@ -77,26 +102,46 @@ class DragList
         this._element.removeEventListener("itemhover",e);
     }
 
+    addOnItemSelected(e){
+        this._element.addEventListener("itemselected",e);
+    }
+    removeOnItemSelected(e){
+        this._element.removeEventListener("itemselected",e);
+    }
+
+    connectCallbacks(item){
+        item.OnHover((obj, hover)=>{
+            let event = new CustomEvent("itemhover",{"detail":{dataobject:obj,hover:hover}});
+            this._element.dispatchEvent(event);
+        });
+        item.OnClicked((obj)=>{
+            if(obj!==undefined && this._current_selected_item !== obj){
+                if(this._current_selected_item!==undefined)
+                {
+                    this._current_selected_item.Selected = false;
+                }
+                this._current_selected_item = obj;
+                this._current_selected_item.Selected = true;
+                let event = new CustomEvent("itemselected",{"detail":{dataobject:obj}});
+                this._element.dispatchEvent(event);
+            }
+        });
+    }
+
     Clear()
     {
         this._items = [];
         this._element.innerText = "";
     }
     AddItem(item){
-        item.OnHover((obj, hover)=>{
-            let event = new CustomEvent("itemhover",{"detail":{obj:obj,hover:hover}});
-            this._element.dispatchEvent(event);
-        });
+        this.connectCallbacks(item);
         this._items.push(item)
         this._element.appendChild(item.Element);
         return item;
     }
     NewItem(content, data){
         let item = new DragListItem(content, data);
-        item.OnHover((obj, hover)=>{
-            let event = new CustomEvent("itemhover",{"detail":{obj:obj,hover:hover}});
-            this._element.dispatchEvent(event);
-        });
+        this.connectCallbacks(item);
         this._items.push(item)
         this._element.appendChild(item.Element);
         return item;
@@ -345,9 +390,46 @@ class Moveable
             });
             this._element.addEventListener("mousedown", (ev)=>{ if(ev.srcElement === this._element) this.PointerDown(ev)});
             this._element.addEventListener("mouseup", (ev)=>{ if(ev.srcElement === this._element) this.PointerUp(ev)});
-        }
-        
+        }        
     }
+
+    set Hidden(value){
+        if(value) this._element.style.display = "none";
+        else this._element.style.display = "";
+    }
+    get Element(){
+        return this._element;
+    }
+    set X(value){
+        this._x = value;
+        this._element.style.left = this._x+'px'
+    }
+    get X()
+    {
+        return this._x;
+    }
+    set Y(value){
+        this._y = value;
+        this._element.style.top = this._y+'px'
+    }
+    get Y()
+    {
+        return this._y;
+    }
+    get Width(){
+        return this._rect.width;
+    }
+    get Height(){
+        return this._rect.height;
+    }
+    get HWidth(){
+        return this._half_width;
+    }
+    get HHeight(){
+        return this._half_height;
+    }
+
+
     MoveTo(x,y,center){
         if(center){
             let nx = x - this._half_width;
@@ -386,42 +468,7 @@ class Moveable
             this._parent_frame.ObjectInteraction(this,false,this._was_moved);
             this._pointer_down = false;
         }
-    }
-    set Hidden(value){
-        if(value) this._element.style.display = "none";
-        else this._element.style.display = "";
-    }
-    get Element(){
-        return this._element;
-    }
-    set X(value){
-        this._x = value;
-        this._element.style.left = this._x+'px'
-    }
-    get X()
-    {
-        return this._x;
-    }
-    set Y(value){
-        this._y = value;
-        this._element.style.top = this._y+'px'
-    }
-    get Y()
-    {
-        return this._y;
-    }
-    get Width(){
-        return this._rect.width;
-    }
-    get Height(){
-        return this._rect.height;
-    }
-    get HWidth(){
-        return this._half_width;
-    }
-    get HHeight(){
-        return this._half_height;
-    }
+    }    
 }
 
 
