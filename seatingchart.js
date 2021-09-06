@@ -349,9 +349,9 @@ class DeskManager
     }
 
     SetData(deskconfig, dataresolver){
-        let new_desk_count = deskconfig.length;
+        let new_desk_count = deskconfig===undefined ? 0 : deskconfig.length;
         let current_desk_count = this._desks.length;
-        for(let n=0;n<deskconfig.length;n++){
+        for(let n=0;n<new_desk_count;n++){
             let olddesk = deskconfig[n];
             let currdesk;
             if(n<current_desk_count){
@@ -401,6 +401,8 @@ function LoadSeatingChart(class_options, student_list, data){
     const Classes = data.classes;
     const DeskConfiguration = data.deskconfiguration;
 
+    
+
     student_list.addOnItemHover((ev)=>{
         let obj = ev.detail.obj;
         let desk = desk_manager.Find("uid",obj.Data.uid);
@@ -412,7 +414,7 @@ function LoadSeatingChart(class_options, student_list, data){
 
     //Update our data if the class is changed
     class_options.addSelectedItemChanged((ev)=>{
-        let detail =ev.detail;
+        let detail = ev.detail;
         //Store off current data
         if(detail.previous.Data){
             let data = [];
@@ -428,12 +430,7 @@ function LoadSeatingChart(class_options, student_list, data){
             })
             DeskConfiguration[detail.previous.Data] = data;
         }
-        desk_manager.SetData(DeskConfiguration[detail.current.Data],(data)=>{
-            if(data.uid!==undefined){
-                return Classes[detail.current.Data].students.find(s=>s.uid==data.uid);
-            }
-            return undefined;
-        });
+        SetClass(detail.current.Data);
     });
 
     const desk_count = document.getElementById("desk-count");
@@ -540,5 +537,17 @@ function LoadSeatingChart(class_options, student_list, data){
     UpdateColControl();
     desk_columns_edit.addEventListener("change",UpdateColControl);
     desk_columns_edit.addEventListener("input",UpdateColControl);
+
+
+    function SetClass(classname){
+        desk_manager.SetData(DeskConfiguration[classname],(data)=>{
+            if(data.uid!==undefined){
+                return Classes[classname].students.find(s=>s.uid==data.uid);
+            }
+            return undefined;
+        });
+    }
+
+    SetClass(class_options.SelectedItem.Data);
 }
 

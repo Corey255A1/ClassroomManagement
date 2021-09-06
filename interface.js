@@ -116,19 +116,26 @@ assigned_desk_chk.addEventListener("change",(e)=>{
 
 
 
-
+const loaded_plugins = {};
 function LoadPlugin(plugin_name, init){
+    const previously_loaded = loaded_plugins[plugin_name]!==undefined
     fetch(plugin_name+".html").then(resp=>{
         resp.text().then(t=>{
             tool_insertion.innerHTML = t;
+            if(previously_loaded){
+                window[init](class_options, student_list, {classes:Classes, deskconfiguration:DeskConfiguration});
+            }
+            else{
+                const plugin = document.createElement("script")
+                plugin.setAttribute("src",plugin_name+".js");
+                document.body.appendChild(plugin);
+                plugin.addEventListener("load",()=>{
+                    window[init](class_options, student_list, {classes:Classes, deskconfiguration:DeskConfiguration});
+                })
+                loaded_plugins[plugin_name] = plugin;
+            }
         })
     });
-    const plugin = document.createElement("script")
-    plugin.setAttribute("src",plugin_name+".js");
-    document.body.appendChild(plugin);
-    plugin.addEventListener("load",()=>{
-        window[init](class_options, student_list, {classes:Classes, deskconfiguration:DeskConfiguration});
-    })
 }
 
 
