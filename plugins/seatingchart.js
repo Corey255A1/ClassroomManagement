@@ -507,17 +507,21 @@ function LoadSeatingChart(class_options, student_list, data){
         desk_manager.GetData().forEach((desk)=>{
             data.push({x:desk.x,y:desk.y});
         })
-        Object.keys(DeskConfiguration).forEach((class_period)=>{
+        //Loop through all class keys because desk config
+        //might not have all classes yet
+        Object.keys(Classes).forEach((class_period)=>{
             let current_config = DeskConfiguration[class_period];
             DeskConfiguration[class_period] = [];
             data.forEach(d=>{
                 DeskConfiguration[class_period].push({x:d.x,y:d.y});
             })
-            current_config.forEach((config,i)=>{
-                if(i<data.length && config.data){
-                    DeskConfiguration[class_period][i].data = config.data;
-                }
-            })
+            if(current_config !== undefined){
+                current_config.forEach((config,i)=>{
+                    if(i<data.length && config.data){
+                        DeskConfiguration[class_period][i].data = config.data;
+                    }
+                })
+            }
         });
         
     });
