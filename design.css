@@ -207,8 +207,7 @@ h4{
     justify-content: center;
     align-items: center;
     position: absolute;
-    width: 125px;
-    height: 125px;
+    
     background-color: wheat;
     color: black;
     box-shadow: 1px 1px 2px black;
@@ -216,6 +215,10 @@ h4{
     border-radius: 5px;
     overflow: hidden;
     z-index: 1;
+
+    width: 120px;
+    height: 120px;
+    font-size: 16px;
 
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -303,6 +306,7 @@ h4{
 .desk-icon.desk-number{
     top: 0;
     left: 0;
+    font-size: 1rem;
 }
 
 
@@ -353,6 +357,11 @@ button.sm{
     font-size: .8rem;
 }
 
+button.square{
+    width:30px;
+    height:30px;
+}
+
 button.push-active{
     background-color: darkgray;
     /* border-top: 2px solid black;
@@ -375,6 +384,11 @@ button.push-active{
 .info.med{
     margin: 2px;
     width: 100px;
+}
+
+.ctrl-group{
+    display: flex;
+    flex-direction: row;
 }
 
 

@@ -523,8 +523,12 @@ function LoadSeatingChart(class_options, student_list, data){
                 })
             }
         });
-        
     });
+
+    const dummy = document.createElement("div");
+    dummy.classList.add("desk");
+    const initial_deskstyle = dummy.style;
+    
 
     const desk_rows_edit = document.getElementById("desk-rows-edit");
     function UpdateRowControl(){
@@ -552,6 +556,7 @@ function LoadSeatingChart(class_options, student_list, data){
         });
     }
 
+    //Initial Class Display
     SetClass(class_options.SelectedItem.Data);
 }
 
