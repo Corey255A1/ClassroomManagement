@@ -1,7 +1,7 @@
 class Desk extends Moveable
 {
-    constructor(x,y,frame,clickable){
-        super(x,y,document.createElement("div"),frame, clickable)
+    constructor(x,y,clickable){
+        super(x,y,document.createElement("div"), clickable)
         this._content = document.createElement("div");
         this._content.classList.add("no-pointer");
         this._element.classList.add("desk");
@@ -55,8 +55,6 @@ class Desk extends Moveable
         return this._element;
     }
 
-    
-
     get Selected(){
         return this._selected;
     }
@@ -95,6 +93,10 @@ class Desk extends Moveable
     }
     get Data(){
         return this._data;
+    }
+    set Scale(value){
+        this._content.style.transform = `scale(${value})`;
+        super.Scale = value;
     }
     OnDrop(callback){
         this._drop.OnDrop(callback);
@@ -138,20 +140,21 @@ class DeskPlacementPreviewer
         this._rows = 1;
         this._columns = 1;
         this._current_count = this._rows*this._columns;
-        this._spacing = 5;
+        this._spacing = 10;
         this._max = max;
 
         this._previewobjects = [];
         this._hidden = true;
         this._x = 0;
         this._y = 0;
-        for(let i=0;i<max;i++){
-            
+        for(let i=0;i<max;i++)
+        {
             let elem = document.createElement("div");
             elem.classList.add("desk");
             elem.classList.add("interactive");
             elem.classList.add("no-pointer");
-            let moveable = new Moveable(0,0,elem,frame,false);
+            let moveable = new Moveable(0,0,elem,false);
+            frame.AddObject(moveable);
             moveable.Hidden = this._hidden;
             this._previewobjects.push(moveable);
         }
@@ -197,7 +200,10 @@ class DeskPlacementPreviewer
                 let idx = this._columns*r + c;
                 if(idx>=this._max) break;
                 let obj = this._previewobjects[idx];
-                obj.MoveTo(x+(this._spacing+obj.Width)*c,y+(this._spacing+obj.Height)*r,true);
+                let newX = x+(this._spacing+obj.Width)*c;
+                let newY = y+(this._spacing+obj.Height)*r;
+                //console.log(`${newX}, ${newY}`);
+                obj.MoveTo(newX,newY,true);
             }
         }
     }
@@ -258,7 +264,8 @@ class DeskManager
     NewDesk(x,y){
         x = x===undefined ? 0 : x;
         y = y===undefined ? 0 : y;
-        let desk = new Desk(x,y,this._frame,true);
+        let desk = new Desk(x,y,true);
+        this._frame.AddObject(desk);
         desk.OnSwap((d)=>{
             if(this._currentSwap !== undefined && this._currentSwap !== d){
                 let tempData = this._currentSwap.Data;
@@ -388,6 +395,14 @@ class DeskManager
     }
     ClearData(){
         this._desks.forEach((d)=>{d.Clear()})
+    }
+
+    IncreaseScale(){
+        this._frame.IncreaseScale();
+    }
+
+    DecreaseScale(){
+        this._frame.DecreaseScale();
     }
 }
 
@@ -528,7 +543,14 @@ function LoadSeatingChart(class_options, student_list, data){
     const dummy = document.createElement("div");
     dummy.classList.add("desk");
     const initial_deskstyle = dummy.style;
-    
+
+    document.getElementById("desk-scale-inc").addEventListener("click",()=>{
+        desk_manager.IncreaseScale();
+    })
+    document.getElementById("desk-scale-dec").addEventListener("click",()=>{
+        desk_manager.DecreaseScale();
+    })
+
 
     const desk_rows_edit = document.getElementById("desk-rows-edit");
     function UpdateRowControl(){

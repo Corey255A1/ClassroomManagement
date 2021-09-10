@@ -282,12 +282,25 @@ class MoveFrame
         this._pointerMoveCB = undefined;
         this._pointerEnterCB = undefined;
         this._pointerInteractedCB = undefined;
+        this._scale = 1.0;
     }
     get Element(){
         return this._element;
     }
     set GridSize(value){
         this._grid_size = value;
+    }
+    get Width(){
+        return this._rect.width;
+    }
+    get Height(){
+        return this._rect.height;
+    }
+    get ScaledWidth(){
+        return this._rect.width/this._scale;
+    }
+    get ScaledHeight(){
+        return this._rect.height/this._scale;
     }
     OnPointerEnter(callback){
         this._pointerEnterCB = callback;
@@ -303,6 +316,8 @@ class MoveFrame
     }
     AddObject(obj){
         this._element.appendChild(obj.Element);
+        obj.SetParent(this);
+        obj.Scale = this._scale;
         //let moveable = new Moveable(x,y,element, this, clickable);
         this._objects.push(obj);
         return obj;
@@ -314,8 +329,8 @@ class MoveFrame
         
         if(pointerState===true){
             this._pointer_down = true;
-            let x = this.RoundToGrid(ev.clientX - this._pageX);
-            let y = this.RoundToGrid(ev.clientY - this._pageY);
+            let x = this.RoundToGrid((ev.clientX - this._pageX)/this._scale);
+            let y = this.RoundToGrid((ev.clientY - this._pageY)/this._scale);
             this._lastX = x;
             this._lastY = y;
         }else if(pointerState === false){
@@ -329,8 +344,8 @@ class MoveFrame
     }
     PointerMove(ev){
         
-        let x = this.RoundToGrid(ev.clientX - this._pageX);
-        let y = this.RoundToGrid(ev.clientY - this._pageY);
+        let x = this.RoundToGrid((ev.clientX - this._pageX)/this._scale);
+        let y = this.RoundToGrid((ev.clientY - this._pageY)/this._scale);
         let dX = x - this._lastX;
         let dY = y - this._lastY;
         if(this._pointer_down){
@@ -357,22 +372,34 @@ class MoveFrame
         this._current_interactions.splice(idx,1);
         //if(this._pointerInteractedCB) this._pointerInteractedCB(obj, false);
     }
+    IncreaseScale(){
+        if(this._scale<2.0){
+            this._scale += 0.1;
+            this._objects.forEach(o=>o.Scale = this._scale);
+        }
+    }
+    DecreaseScale(){
+        if(this._scale>0.5){
+            this._scale -= 0.1;
+            this._objects.forEach(o=>o.Scale = this._scale);
+        }
+    }
     
 }
 
 class Moveable
 {
-    constructor(x, y, element, parentFrame, clickable){
-        this._parent_frame = parentFrame;
+    constructor(x, y, element, clickable){
+        this._parent_frame = undefined;
         this._element = element;
-        this._parent_frame.AddObject(this);
         
-        this._rect = this._element.getBoundingClientRect();
-        this._half_width = Math.floor(this._rect.width/2);
-        this._half_height = Math.floor(this._rect.height/2);
+        this._rect = {width:1,height:1};
+        this._half_width = 1;
+        this._half_height = 1;
         
         this._x = undefined;
         this._y = undefined;
+        this._scale = 1.0;
         this.X = x;
         this.Y = y;
         this._was_moved = false;
@@ -400,9 +427,18 @@ class Moveable
     get Element(){
         return this._element;
     }
+    set Scale(value){
+        this._scale = value;
+        this._element.style.left = this._x*this._scale+'px';
+        this._element.style.top = this._y*this._scale+'px';
+        //console.log(this._rect);
+        this._element.style.width = this._rect.width*this._scale+'px';
+        this._element.style.height = this._rect.height*this._scale+'px';
+        //this.updateBoundary();
+    }
     set X(value){
         this._x = value;
-        this._element.style.left = this._x+'px'
+        this._element.style.left = this._x*this._scale+'px';
     }
     get X()
     {
@@ -410,7 +446,7 @@ class Moveable
     }
     set Y(value){
         this._y = value;
-        this._element.style.top = this._y+'px'
+        this._element.style.top = this._y*this._scale+'px';
     }
     get Y()
     {
@@ -429,17 +465,31 @@ class Moveable
         return this._half_height;
     }
 
+    UpdateBoundary(){
+        this._rect = this._element.getBoundingClientRect();
+        this._half_width = Math.floor(this._rect.width/2);
+        this._half_height = Math.floor(this._rect.height/2);
+    }
+
 
     MoveTo(x,y,center){
         if(center){
             let nx = x - this._half_width;
-            if(nx<0) nx = 0;
-            else if(nx>this._parent_frame._rect.width) nx= this._parent_frame._rect.width;
+            if(nx<0){ 
+                nx = 0;
+            }
+            else if(nx>this._parent_frame.ScaledWidth){
+                nx= this._parent_frame.ScaledWidth; 
+            }
             this.X = this._parent_frame.RoundToGrid(nx);
 
             let ny = y - this._half_height;
-            if(ny<0) ny = 0;
-            else if(ny>this._parent_frame._rect.height) ny= this._parent_frame._rect.height;
+            if(ny<0){
+                ny = 0;
+            }
+            else if(ny>this._parent_frame.ScaledHeight){ 
+                ny= this._parent_frame.ScaledHeight;
+            }
             this.Y = this._parent_frame.RoundToGrid(ny);
         }else{
             this.X = x;
@@ -449,11 +499,11 @@ class Moveable
     }
     Move(dx,dy){
         let nx = this._parent_frame.RoundToGrid(this._x + dx);
-        if(nx>0 && nx<this._parent_frame._rect.width){
+        if(nx>0 && nx<this._parent_frame.ScaledWidth){
             this.X = nx;
         }
         let ny = this._parent_frame.RoundToGrid(this._y + dy);
-        if(ny>0 && ny<this._parent_frame._rect.height){
+        if(ny>0 && ny<this._parent_frame.ScaledHeight){
             this.Y = ny;
         }
         this._was_moved = true;
@@ -468,7 +518,12 @@ class Moveable
             this._parent_frame.ObjectInteraction(this,false,this._was_moved);
             this._pointer_down = false;
         }
-    }    
+    }
+    
+    SetParent(frame){
+        this._parent_frame = frame;
+        this.UpdateBoundary();
+    }
 }
 
 
