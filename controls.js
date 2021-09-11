@@ -561,3 +561,54 @@ nav_combo.forEach((nav)=>{
         options.classList.toggle("collapsed");
     })
 })
+
+
+
+
+class DataTableRow
+{
+    constructor(template){
+        this._data = {};
+        this._element = document.createElement("tr");
+        template.forEach((elem)=>{
+            this._data[elem] = document.createElement("td");
+            this._element.appendChild(this._data[elem]);
+        });
+        
+        
+    }
+    get Element(){
+        return this._element;
+    }
+    SetField(field, data){
+        if(this._data[field] !== undefined){
+            this._data[field].innerHTML = data;
+        }
+    }
+
+}
+
+class DataTable
+{
+    constructor(){
+        this._element = document.createElement("table");
+        this._rows = [];
+        this._header = [];
+        this._headerhidden =  true;
+    }
+    set HideHeader(value){
+        this._headerhidden = value;
+    }
+    get Element(){
+        return this._element;
+    }
+    AddHeader(name){
+        this._header.push(name);
+    }
+    AddRow(){
+        let row = new DataTableRow(this._header);
+        this._element.appendChild(row.Element);
+        this._rows.push(row);
+        return row;
+    }
+}

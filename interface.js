@@ -22,7 +22,11 @@ const Classes = {
     students:[
         {firstname:"Connor",lastname:"Schwendeman",uid:"5",properties:{}},
         {firstname:"Alexis",lastname:"Lovelace",uid:"6",properties:{}},
-        {firstname:"Samantha",lastname:"Butterscotch",uid:"7",properties:{}},
+        {firstname:"Samantha",lastname:"Butterscotch",uid:"7",properties:{
+            "absences":7,
+            "tardies":2,
+            "accessibility":["glasses","more time","english as second language"]
+        }},
         {firstname: "Wu",lastname: "Xingping",uid:"8",properties:{}},
         {firstname: "Robbie",lastname: "Jones",uid:"9",properties:{}},
         {firstname: "Robbie",lastname: "Jones",uid:"10",properties:{}},
@@ -134,9 +138,29 @@ function LoadPlugin(plugin_name, init){
     });
 }
 
-LoadPlugin("studentinfo","LoadStudentInfo");
 
-const tool_select = document.getElementById("tool-selection");
-tool_select.addEventListener("navcomboselected",(e)=>{
-    LoadPlugin(e.detail.dataset.plugin, e.detail.dataset.init);
-});
+
+function ProcessHashChange(){
+    switch(window.location.hash){
+        case "#student-info":
+            LoadPlugin("studentinfo","LoadStudentInfo");
+            break;
+        case "#seating-chart":
+            LoadPlugin("seatingchart","LoadSeatingChart");
+            break;
+        default:
+            LoadPlugin("studentinfo","LoadStudentInfo");
+            break;
+    }
+}
+
+
+ProcessHashChange();
+
+window.addEventListener("hashchange",ProcessHashChange);
+
+
+// const tool_select = document.getElementById("tool-selection");
+// tool_select.addEventListener("navcomboselected",(e)=>{
+//     LoadPlugin(e.detail.dataset.plugin, e.detail.dataset.init);
+// });

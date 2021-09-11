@@ -447,12 +447,12 @@ button.push-active{
 
 table.report{
     border: 1px solid black;
-    box-shadow: 2px 2px 2px black;
+    box-shadow: 2px 2px 6px black;
     border-collapse: collapse;
     table-layout: fixed;
 }
 
-table.report > tr, td{
+table.report > tr, td, tr > th{
     border: 1px solid black;
     width: 100px;
     padding: 5px;
