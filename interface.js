@@ -23,9 +23,17 @@ const Classes = {
         {firstname:"Connor",lastname:"Schwendeman",uid:"5",properties:{}},
         {firstname:"Alexis",lastname:"Lovelace",uid:"6",properties:{}},
         {firstname:"Samantha",lastname:"Butterscotch",uid:"7",properties:{
-            "absences":7,
-            "tardies":2,
-            "accessibility":["glasses","more time","english as second language"]
+            "Absences":7,
+            "Tardies":2,
+            "Email":"samantha.butterscotch@grandviewhighschool.edu",
+            "Birthday":"09/15/2009",
+            "Gender":"Undisclosed",
+            "Race":"Asian Pacific",
+            "Native Language":"Vietnamese",
+            "Bus Number":28,
+            "Allergies":"Banana",
+            "Grade":"7th",
+            "Accessibility":["Vision Impairment","Extra Test Time","English as Second Language"]
         }},
         {firstname: "Wu",lastname: "Xingping",uid:"8",properties:{}},
         {firstname: "Robbie",lastname: "Jones",uid:"9",properties:{}},

@@ -574,15 +574,16 @@ class DataTableRow
             this._data[elem] = document.createElement("td");
             this._element.appendChild(this._data[elem]);
         });
-        
-        
     }
     get Element(){
         return this._element;
     }
-    SetField(field, data){
+    SetField(field, data, classlists){
         if(this._data[field] !== undefined){
             this._data[field].innerHTML = data;
+        }
+        if(classlists !== undefined){
+            classlists.forEach(c=>this._data[field].classList.add(c));
         }
     }
 

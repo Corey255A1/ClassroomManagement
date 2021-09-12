@@ -8,13 +8,17 @@ function LoadStudentInfo(class_options, student_list, data){
 
     function UpdateStudentDisplay(student){
         if(student!==undefined){
+            if(student_data.children[0] !== undefined)
+                student_data.children[0].remove();
             let table = new DataTable();
+            table.Element.classList.add("report");
+            table.Element.classList.add("color2");
             table.AddHeader("property");
             table.AddHeader("value");
             Object.keys(student.properties).forEach((k)=>{
                 let row = table.AddRow();
-                row.SetField("property", k);
-                row.SetField("value", student.properties[k]);
+                row.SetField("property", k,["color3","property-field"]);
+                row.SetField("value", student.properties[k],["value-field"]);
             })
             
             student_data.appendChild(table.Element);

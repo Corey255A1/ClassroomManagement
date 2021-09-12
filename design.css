@@ -450,10 +450,19 @@ table.report{
     box-shadow: 2px 2px 6px black;
     border-collapse: collapse;
     table-layout: fixed;
+    margin: 5px;
 }
 
 table.report > tr, td, tr > th{
     border: 1px solid black;
     width: 100px;
     padding: 5px;
+}
+
+.property-field{
+    width: 120px;
+    text-align: right;
+}
+.value-field{
+    width:400px;
 }
