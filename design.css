@@ -445,12 +445,28 @@ button.push-active{
     height: 25px;
 }
 
+
+
+img.medium{
+    width: 100%;
+}
+
+.row{
+    display: flex;
+    flex-direction: row;
+}
+.column {
+    display: flex;
+    flex-direction: column;
+    padding:5px;
+}
+
 table.report{
     border: 1px solid black;
     box-shadow: 2px 2px 6px black;
     border-collapse: collapse;
     table-layout: fixed;
-    margin: 5px;
+    margin-top: 5px;
 }
 
 table.report > tr, td, tr > th{
@@ -458,6 +474,7 @@ table.report > tr, td, tr > th{
     width: 100px;
     padding: 5px;
 }
+
 
 .property-field{
     width: 120px;

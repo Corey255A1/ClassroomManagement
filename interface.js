@@ -22,19 +22,27 @@ const Classes = {
     students:[
         {firstname:"Connor",lastname:"Schwendeman",uid:"5",properties:{}},
         {firstname:"Alexis",lastname:"Lovelace",uid:"6",properties:{}},
-        {firstname:"Samantha",lastname:"Butterscotch",uid:"7",properties:{
-            "Absences":7,
-            "Tardies":2,
-            "Email":"samantha.butterscotch@grandviewhighschool.edu",
-            "Birthday":"09/15/2009",
-            "Gender":"Undisclosed",
-            "Race":"Asian Pacific",
-            "Native Language":"Vietnamese",
-            "Bus Number":28,
-            "Allergies":"Banana",
-            "Grade":"7th",
-            "Accessibility":["Vision Impairment","Extra Test Time","English as Second Language"]
-        }},
+        {firstname:"Samantha",lastname:"Butterscotch",uid:"7",
+        properties:{
+            personal:{
+                "Birthday":"09/15/2009",
+                "Gender":"Undisclosed",
+                "Race":"Asian Pacific",
+                "Native Language":"Vietnamese",
+                "Allergies":"Banana",
+            },
+            school:{
+                "Absences":7,
+                "Tardies":2,
+                "Email":"samantha.butterscotch@grandviewhighschool.edu",
+                "Bus Number":28,
+                "Grade":"7th",
+                "Accessibility":["Vision Impairment","Extra Test Time","English as Second Language"]
+            }
+            
+        },
+        guardianid:"4"
+        },
         {firstname: "Wu",lastname: "Xingping",uid:"8",properties:{}},
         {firstname: "Robbie",lastname: "Jones",uid:"9",properties:{}},
         {firstname: "Robbie",lastname: "Jones",uid:"10",properties:{}},
