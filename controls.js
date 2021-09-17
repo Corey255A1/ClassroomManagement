@@ -555,11 +555,12 @@ nav_combo.forEach((nav)=>{
             }
         });
     })
-    
-    open.addEventListener("click",()=>
+    const open_menu = function()
     {
         options.classList.toggle("collapsed");
-    })
+    }
+    current.addEventListener("click",open_menu);
+    open.addEventListener("click",open_menu);
 })
 
 

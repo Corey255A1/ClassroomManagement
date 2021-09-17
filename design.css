@@ -445,9 +445,7 @@ button.push-active{
     height: 25px;
 }
 
-
-
-img.medium{
+img{
     width: 100%;
 }
 
@@ -458,7 +456,17 @@ img.medium{
 .column {
     display: flex;
     flex-direction: column;
-    padding:5px;
+    padding:2px;
+    margin: 5px;
+}
+
+.column > .cell{
+    margin: 5px 0;
+}
+
+.rounded{
+    border-radius: 5px;
+    overflow: hidden;
 }
 
 table.report{
@@ -466,7 +474,6 @@ table.report{
     box-shadow: 2px 2px 6px black;
     border-collapse: collapse;
     table-layout: fixed;
-    margin-top: 5px;
 }
 
 table.report > tr, td, tr > th{
